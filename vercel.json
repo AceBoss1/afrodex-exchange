@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_CONTRACT_ADDRESS": "@contract_address",
+    "NEXT_PUBLIC_CHAIN_ID": "@chain_id",
+    "DATABASE_URL": "@database_url",
+    "ETHEREUM_RPC_URL": "@ethereum_rpc_url"
+  }
+}

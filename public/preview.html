@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfroDex - Africa's Biggest DEX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0f0f0f;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            border-bottom: 1px solid #333333;
+            background: #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-section img {
+            height: 56px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #a0a0a0;
+            font-style: italic;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #a0a0a0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #ffd700;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .wallet-info {
+            padding: 0.5rem 1rem;
+            background: #2a2a2a;
+            border: 1px solid #333333;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            color: #a0a0a0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .connect-btn {
+            padding: 0.5rem 1rem;
+            background: #ffd700;
+            color: #0f0f0f;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .connect-btn:hover {
+            background: #ccaa00;
+        }
+
+        /* Main Content */
+        main {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 448px;
+        }
+
+        /* Welcome Card */
+        .welcome-card {
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            space: 1.5rem;
+        }
+
+        .welcome-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ffd700, #00d4ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+        }
+
+        .welcome-card h2 {
+            font-size: 1.875rem;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-card p {
+            color: #a0a0a0;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-card .subtitle {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #ffd700;
+            color: #0f0f0f;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1.5rem;
+        }
+
+        .primary-btn:hover {
+            background: #ccaa00;
+        }
+
+        .terms {
+            font-size: 0.75rem;
+            color: #a0a0a0;
+            margin-top: 1.5rem;
+        }
+
+        /* Swap Card */
+        .swap-card {
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .swap-header {
+            margin-bottom: 1rem;
+        }
+
+        .swap-header h2 {
+            font-size: 1.5rem;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .swap-header p {
+            font-size: 0.875rem;
+            color: #a0a0a0;
+        }
+
+        .swap-section {
+            margin-bottom: 1rem;
+        }
+
+        .swap-label {
+            font-size: 0.875rem;
+            color: #a0a0a0;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .token-input {
+            background: #2a2a2a;
+            border: 1px solid #333333;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .token-input input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .token-input input::placeholder {
+            color: #a0a0a0;
+        }
+
+        .token-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            color: #ffd700;
+            font-weight: 500;
+        }
+
+        .reverse-btn {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .reverse-btn button {
+            padding: 0.5rem;
+            background: #ffd700;
+            color: #0f0f0f;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+
+        .reverse-btn button:hover {
+            background: #ccaa00;
+        }
+
+        .price-info {
+            background: #2a2a2a;
+            border: 1px solid #333333;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+            color: #a0a0a0;
+        }
+
+        .swap-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #ffd700;
+            color: #0f0f0f;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+
+        .swap-btn:hover {
+            background: #ccaa00;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .header-right {
+                gap: 0.5rem;
+            }
+
+            .wallet-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/afrodex_logo-roMvtYxeobViSwDj75KOCZHk3cc8hn.jpg" alt="AfroDex Logo">
+                <div class="logo-text">
+                    <h1>AfroDex</h1>
+                    <p>Africa's biggest DEX</p>
+                </div>
+            </div>
+
+            <nav>
+                <a href="#">Swap</a>
+                <a href="#">Liquidity</a>
+                <a href="#">Analytics</a>
+            </nav>
+
+            <div class="header-right">
+                <div class="wallet-info">0x1234...5678</div>
+                <button class="connect-btn">Disconnect</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Welcome Card (shown when not connected) -->
+            <div class="welcome-card" style="display: none;">
+                <div class="welcome-icon">🦊</div>
+                <h2>Welcome to AfroDex</h2>
+                <p>Africa's biggest decentralized exchange</p>
+                <p class="subtitle">Connect your wallet to start trading crypto assets</p>
+                <button class="primary-btn">Connect MetaMask</button>
+                <p class="terms">By connecting, you agree to our Terms of Service</p>
+            </div>
+
+            <!-- Swap Card (shown when connected) -->
+            <div class="swap-card">
+                <div class="swap-header">
+                    <h2>Swap</h2>
+                    <p>Trade crypto assets instantly</p>
+                </div>
+
+                <!-- From Token -->
+                <div class="swap-section">
+                    <label class="swap-label">From</label>
+                    <div class="token-input">
+                        <input type="number" placeholder="0.0">
+                        <div class="token-selector">
+                            <span>ETH</span>
+                            <span>▼</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reverse Button -->
+                <div class="reverse-btn">
+                    <button>⇅</button>
+                </div>
+
+                <!-- To Token -->
+                <div class="swap-section">
+                    <label class="swap-label">To</label>
+                    <div class="token-input">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #ffffff;">0.0</div>
+                        <div class="token-selector">
+                            <span>USDC</span>
+                            <span>▼</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Info -->
+                <div class="price-info">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Price:</span>
+                        <span style="color: #ffd700;">1 ETH = 2,500 USDC</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Slippage:</span>
+                        <span style="color: #ffd700;">0.5%</span>
+                    </div>
+                </div>
+
+                <!-- Swap Button -->
+                <button class="swap-btn">Swap</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
