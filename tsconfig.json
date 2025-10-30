@@ -13,14 +13,14 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "jsx": "react-jsx", // Next.js uses the React automatic runtime
+    "jsx": "react-jsx",
     
-    // --- START: ADDED PATHS TO FIX '@/' ALIAS ERRORS ---
+    // --- CRITICAL ADDITIONS TO FIX THE '@/' IMPORTS ---
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"] // This tells Next.js/TypeScript that @/ points to the project root
+      "@/*": ["./*"] 
     }
-    // --- END: ADDED PATHS TO FIX '@/' ALIAS ERRORS ---
+    // ----------------------------------------------------
   },
   "include": [
     "**/*.ts",
