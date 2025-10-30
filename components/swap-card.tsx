@@ -5,11 +5,20 @@ import { ethers } from "ethers"
 import TokenSelector from "./token-selector"
 import PriceDisplay from "./price-display"
 
+// 1. UPDATE: Add the onPlaceOrder function to the component props
 interface SwapCardProps {
   userAddress: string
+  onPlaceOrder: (
+    isBuy: boolean, 
+    tokenSell: string, 
+    tokenBuy: string, 
+    amountSell: string, 
+    amountBuy: string
+  ) => Promise<void>
 }
 
-export default function SwapCard({ userAddress }: SwapCardProps) {
+// 2. UPDATE: Destructure onPlaceOrder from props
+export default function SwapCard({ userAddress, onPlaceOrder }: SwapCardProps) {
   const [tokenIn, setTokenIn] = useState("ETH")
   const [tokenOut, setTokenOut] = useState("USDC")
   const [amountIn, setAmountIn] = useState("")
@@ -26,6 +35,7 @@ export default function SwapCard({ userAddress }: SwapCardProps) {
 
   const fetchPrice = async () => {
     try {
+      // NOTE: This API call is kept separate, as it typically doesn't require signing
       const response = await fetch("/api/price", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,16 +49,18 @@ export default function SwapCard({ userAddress }: SwapCardProps) {
       if (!response.ok) throw new Error("Failed to fetch price")
       const data = await response.json()
       setPriceData(data)
-      setAmountOut(data.price || "0")
+      // Assuming a price is returned that dictates the amountOut
+      setAmountOut(data.price || "0.00") 
     } catch (err) {
       console.error("[v0] Price fetch error:", err)
       setError("Failed to fetch price")
     }
   }
 
+  // 3. REFATOR: Use the onPlaceOrder prop to submit the order
   const handleSwap = async () => {
-    if (!amountIn) {
-      setError("Please enter an amount")
+    if (!amountIn || !amountOut || parseFloat(amountIn) <= 0) {
+      setError("Please enter a valid amount to trade.")
       return
     }
 
@@ -56,58 +68,30 @@ export default function SwapCard({ userAddress }: SwapCardProps) {
     setError("")
 
     try {
-      if (!window.ethereum) {
-        throw new Error("MetaMask not available")
-      }
+      // Determine if this is a BUY or SELL order based on the token flow
+      // A user is selling tokenIn to buy tokenOut. 
+      // For a simple swap interface, we can consider this a generic order.
+      // We will define it as selling tokenIn for tokenOut.
+      const isBuyOrder = false; // Simplified: Let's treat the Swap as a generic SELL order for now
 
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const signer = await provider.getSigner()
+      // This is the streamlined call to the parent component's handler, 
+      // which uses window.placeOrder (in js/dapp_main.js)
+      await onPlaceOrder(
+        isBuyOrder, // Simplified boolean for order type
+        tokenIn, 
+        tokenOut, 
+        amountIn, 
+        amountOut
+      )
 
-      // Step 1: Create order
-      const createOrderResponse = await fetch("/api/orders/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tokenGet: tokenOut,
-          amountGet: ethers.parseEther(amountOut || "0").toString(),
-          tokenGive: tokenIn === "ETH" ? ethers.ZeroAddress : tokenIn,
-          amountGive: ethers.parseEther(amountIn).toString(),
-          userAddress,
-        }),
-      })
-
-      if (!createOrderResponse.ok) throw new Error("Failed to create order")
-      const orderData = await createOrderResponse.json()
-
-      // Step 2: Sign order hash
-      const signature = await signer.signMessage(ethers.getBytes(orderData.orderHash))
-
-      // Step 3: Execute trade
-      const tradeResponse = await fetch("/api/trade", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tokenGet: orderData.tokenGet,
-          amountGet: orderData.amountGet,
-          tokenGive: orderData.tokenGive,
-          amountGive: orderData.amountGive,
-          expires: orderData.expires,
-          nonce: orderData.nonce,
-          userAddress,
-          signature,
-        }),
-      })
-
-      if (!tradeResponse.ok) throw new Error("Trade failed")
-      const result = await tradeResponse.json()
-
-      console.log("[v0] Trade successful:", result)
-      alert(`Trade executed! TX: ${result.transactionHash}`)
+      console.log("[v0] Order submission triggered.")
       setAmountIn("")
       setAmountOut("")
+
+      // The actual success/failure message will be handled by the logic inside handlePlaceOrder in app/page.tsx
     } catch (err: any) {
       console.error("[v0] Swap error:", err)
-      setError(err.message || "Swap failed")
+      setError(err.message || "Order submission failed")
     } finally {
       setIsLoading(false)
     }
@@ -118,6 +102,10 @@ export default function SwapCard({ userAddress }: SwapCardProps) {
     setTokenOut(tokenIn)
     setAmountIn("")
     setAmountOut("")
+    // Re-fetch price data after token reversal
+    if (amountIn) {
+      fetchPrice(); 
+    }
   }
 
   return (
@@ -157,7 +145,8 @@ export default function SwapCard({ userAddress }: SwapCardProps) {
         <div className="space-y-2">
           <label className="text-sm text-text-secondary font-medium">To</label>
           <div className="bg-surface-light border border-border rounded-lg p-4 space-y-3">
-            <div className="text-2xl font-bold text-text">{amountOut || "0.0"}</div>
+            {/* Display the calculated output amount */}
+            <div className="text-2xl font-bold text-text">{amountOut || "0.0"}</div> 
             <TokenSelector selectedToken={tokenOut} onSelect={setTokenOut} />
           </div>
         </div>
@@ -171,10 +160,10 @@ export default function SwapCard({ userAddress }: SwapCardProps) {
         {/* Swap Button */}
         <button
           onClick={handleSwap}
-          disabled={isLoading || !amountIn}
+          disabled={isLoading || !amountIn || !amountOut} // Disable if no output is calculated
           className="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-background font-bold rounded-lg transition text-lg"
         >
-          {isLoading ? "Swapping..." : "Swap"}
+          {isLoading ? "Submitting Order..." : "Submit Order"}
         </button>
       </div>
     </div>
