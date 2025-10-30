@@ -16,7 +16,7 @@ CONTRACT_ABI = json.loads(os.environ.get("CONTRACT_ABI_JSON", "[]")) # ABI of yo
 if not NODE_URL or not PRIVATE_KEY or not CONTRACT_ADDRESS:
     # Use placeholder values if ENV vars are missing (for local testing without full setup)
     print("WARNING: Required environment variables are missing. Using mock Web3 connection.")
-    w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545")) 
+    w3 = Web3(Web3.HTTPProvider("http://127.00.0.1:8545")) 
     w3_connected = False
 else:
     w3 = Web3(Web3.HTTPProvider(NODE_URL))
