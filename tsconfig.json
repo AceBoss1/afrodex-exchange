@@ -17,12 +17,12 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     
-    // 👇 THIS IS THE CRITICAL FIX 👇
+    // 👇 The crucial configuration to fix the Module Not Found error 👇
     "baseUrl": ".",
     "paths": {
-      // This tells Next.js and Vercel that "@" refers to the root directory
+      // General root alias
       "@/*": ["./*"],
-      // Specifically maps the failing import paths:
+      // Specific alias that fixes your current error
       "@/lib/*": ["lib/*"] 
     }
   },
