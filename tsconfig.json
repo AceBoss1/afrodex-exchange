@@ -17,15 +17,14 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     
-    // ⬇️ CRITICAL FIXES FOR PATH ALIASES ⬇️
+    // 👇 THIS IS THE CRITICAL FIX 👇
     "baseUrl": ".",
     "paths": {
       // This tells Next.js and Vercel that "@" refers to the root directory
       "@/*": ["./*"],
-      // Add the specific alias you are using for clarity
-      "@/lib/*": ["lib/*"]
+      // Specifically maps the failing import paths:
+      "@/lib/*": ["lib/*"] 
     }
-    // ⬆️ CRITICAL FIXES FOR PATH ALIASES ⬆️
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
