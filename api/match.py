@@ -8,9 +8,11 @@ from database import db_client, get_orders_for_matching, update_orders_after_mat
 
 # --- CONFIGURATION (Ensure these environment variables are set on Vercel) ---
 PRIVATE_KEY = os.environ.get("RELAYER_PRIVATE_KEY")
-NODE_URL = os.environ.get("MAINNET_NODE_URL")
 CONTRACT_ADDRESS = os.environ.get("CONTRACT_ADDRESS")
 CONTRACT_ABI = json.loads(os.environ.get("CONTRACT_ABI_JSON", "[]")) # ABI of your AfroDEX smart contract
+
+# Use RPC_NODE_URL as the primary variable, with MAINNET_NODE_URL as a fallback
+NODE_URL = os.environ.get("RPC_NODE_URL") or os.environ.get("MAINNET_NODE_URL")
 
 # Initialize Web3
 if not NODE_URL or not PRIVATE_KEY or not CONTRACT_ADDRESS:
