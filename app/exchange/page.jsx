@@ -1,3 +1,5 @@
+"use client"; // <--- FIX: This directive marks the component as a Client Component
+
 import React, { useState, useMemo } from 'react';
 import {
   Menu, X, ChevronDown, Clock, Search, Wallet, BarChart, Settings, Repeat2, Zap, ArrowDown, ArrowUp,
