@@ -23,6 +23,7 @@ let onSnapshot: any;
 let setDoc: any;
 
 try {
+  // We use require here as imports cannot be conditional in React/Next.js environments
   const firebaseAppModule = require('firebase/app');
   initializeApp = firebaseAppModule.initializeApp;
 
@@ -41,7 +42,7 @@ try {
   setDoc = firebaseFirestoreModule.setDoc;
 
 } catch (e) {
-  console.error("Firebase module import error. This is expected if running outside the Canvas environment.", e);
+  // console.error("Firebase module import error. This is expected if running outside the Canvas environment.", e);
 }
 
 
@@ -68,7 +69,6 @@ interface MenuItem {
 
 
 // --- MAIN APP COMPONENT ---
-// RENAMED from 'Home' to 'DEXApp' to eliminate the conflict with the imported Lucide icon.
 export default function DEXApp() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Trade');
@@ -91,8 +91,9 @@ export default function DEXApp() {
 
   // 1. FIREBASE INITIALIZATION & AUTHENTICATION
   useEffect(() => {
-    if (!firebaseConfig) {
-      console.error("Firebase config is missing. Data persistence is disabled.");
+    if (!firebaseConfig || !initializeApp || !getAuth || !getFirestore) {
+      // Firebase libraries couldn't be loaded or config is missing.
+      console.error("Firebase dependencies or config missing. Data persistence is disabled.");
       setAuthReady(true);
       return;
     }
@@ -128,7 +129,8 @@ export default function DEXApp() {
 
   // 2. FIRESTORE REAL-TIME DATA LISTENER (Recent Trades - Public Data)
   useEffect(() => {
-    if (!authReady || !dbInstance) return;
+    // Ensure all necessary dependencies are loaded before subscribing
+    if (!authReady || !dbInstance || !collection || !query || !onSnapshot) return;
 
     const tradesPath = `artifacts/${appId}/public/data/trades`;
     const q = query(collection(dbInstance, tradesPath));
@@ -138,14 +140,17 @@ export default function DEXApp() {
         const tradesData: Trade[] = [];
         snapshot.forEach((doc: any) => {
             const data = doc.data();
-            tradesData.push({ 
-                id: doc.id,
-                pair: data.pair,
-                type: data.type,
-                price: data.price,
-                amount: data.amount,
-                time: data.time 
-            });
+            // Basic validation to ensure all expected fields exist
+            if (data.pair && data.type && data.price !== undefined && data.amount !== undefined && data.time !== undefined) {
+                tradesData.push({ 
+                    id: doc.id,
+                    pair: data.pair,
+                    type: data.type,
+                    price: data.price,
+                    amount: data.amount,
+                    time: data.time 
+                });
+            }
         });
         // Sort by time descending and only keep the last 20
         tradesData.sort((a, b) => b.time - a.time);
@@ -172,14 +177,13 @@ export default function DEXApp() {
   // --- HANDLERS ---
   const handleTradeSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!authReady || !dbInstance || !userId) {
-        console.warn("App not ready or user not logged in.");
+    if (!authReady || !dbInstance || !userId || !collection || !doc || !setDoc) {
+        console.warn("App not ready, user not logged in, or Firestore dependencies missing.");
         return;
     }
 
     // 1. Client-side validation (simple checks)
     if (tradeForm.amount <= 0 || tradeForm.price <= 0) {
-        // In a production app, use a modal or toast notification, not window.alert
         console.error("Amount and price must be greater than zero.");
         return;
     }
@@ -205,8 +209,7 @@ export default function DEXApp() {
         // Update local wallet state (Mock logic)
         setUserWallets(prev => {
             const newWallets = [...prev];
-            const baseToken = tradeForm.pair.split('/')[0]; // AFRO
-            const quoteToken = tradeForm.pair.split('/')[1]; // USD
+            const [baseToken, quoteToken] = tradeForm.pair.split('/'); // e.g., ['AFRO', 'USD']
             const cost = tradeForm.amount * tradeForm.price;
 
             const baseWalletIndex = newWallets.findIndex(w => w.token === baseToken);
@@ -214,11 +217,11 @@ export default function DEXApp() {
 
             if (baseWalletIndex !== -1 && quoteWalletIndex !== -1) {
                 if (tradeForm.type === 'Buy') {
-                    // Buying AFRO: AFRO balance increases, USD balance decreases
+                    // Buying Base Token (AFRO): Base balance increases, Quote balance (USD) decreases
                     newWallets[baseWalletIndex].balance += tradeForm.amount;
                     newWallets[quoteWalletIndex].balance -= cost;
                 } else {
-                    // Selling AFRO: AFRO balance decreases, USD balance increases
+                    // Selling Base Token (AFRO): Base balance decreases, Quote balance (USD) increases
                     newWallets[baseWalletIndex].balance -= tradeForm.amount;
                     newWallets[quoteWalletIndex].balance += cost;
                 }
@@ -455,6 +458,7 @@ export default function DEXApp() {
       </div>
 
       {/* Trade List */}
+      {/* Note: 'custom-scrollbar' class is now defined in app/globals.css */}
       <div className="flex-grow overflow-y-auto custom-scrollbar">
         {recentTrades.length === 0 ? (
             <p className="text-center text-gray-500 mt-4">No recent trades found.</p>
@@ -512,25 +516,7 @@ export default function DEXApp() {
   // Main Trade Dashboard
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
-      <style jsx global>{`
-        body {
-          font-family: 'Inter', sans-serif;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #1f2937; /* gray-800 */
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #374151; /* gray-700 */
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #4b5563; /* gray-600 */
-        }
-      `}</style>
+      {/* Global styles (background, font, scrollbar) are now handled by app/globals.css */}
       
       <Header />
       <MobileMenu />
