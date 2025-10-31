@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, type ReactNode, useCallback, useMemo } from 'react';
-import { LogOut, Menu, X, Home, Coins, BookOpen, FileText, HelpCircle, User, Zap, Activity, Clock, Layers, Maximize } from "lucide-react";
+// FIX: Aliased 'Home' icon to 'HomeIcon' to prevent collision with the exported function.
+import { LogOut, Menu, X, Coins, BookOpen, FileText, HelpCircle, User, Zap, Activity, Clock, Layers, Maximize, Home as HomeIcon, type Icon as LucideIcon } from "lucide-react";
 
 // --- FIREBASE IMPORTS ---
 // IMPORTANT: These are dynamically provided global variables in the execution environment.
@@ -16,14 +17,12 @@ let signInWithCustomToken: any;
 let getFirestore: any;
 let collection: any;
 let doc: any;
-let getDocs: any;
 let query: any;
 let where: any;
 let onSnapshot: any;
 let setDoc: any;
 
 try {
-  // We use dynamic imports to prevent build errors if the environment isn't fully set up
   const firebaseAppModule = require('firebase/app');
   initializeApp = firebaseAppModule.initializeApp;
 
@@ -69,8 +68,8 @@ interface MenuItem {
 
 
 // --- MAIN APP COMPONENT ---
-
-export default function Home() {
+// RENAMED from 'Home' to 'DEXApp' to eliminate the conflict with the imported Lucide icon.
+export default function DEXApp() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Trade');
   const [authReady, setAuthReady] = useState(false);
@@ -163,7 +162,7 @@ export default function Home() {
 
   // --- NAVIGATION DATA ---
   const menuItems: MenuItem[] = [
-    { title: 'Dashboard', icon: Home, path: 'Dashboard' },
+    { title: 'Dashboard', icon: HomeIcon, path: 'Dashboard' },
     { title: 'Trade', icon: Coins, path: 'Trade' },
     { title: 'Activity', icon: Activity, path: 'Activity' },
     { title: 'Docs', icon: BookOpen, path: 'Docs' },
@@ -180,7 +179,8 @@ export default function Home() {
 
     // 1. Client-side validation (simple checks)
     if (tradeForm.amount <= 0 || tradeForm.price <= 0) {
-        alert("Amount and price must be greater than zero.");
+        // In a production app, use a modal or toast notification, not window.alert
+        console.error("Amount and price must be greater than zero.");
         return;
     }
 
@@ -230,8 +230,6 @@ export default function Home() {
 
     } catch (error) {
         console.error("Error submitting trade:", error);
-        // Note: Use a custom UI alert, not window.alert
-        // In a real app, this would be a user-facing error message
     }
   }, [authReady, dbInstance, userId, tradeForm]);
 
