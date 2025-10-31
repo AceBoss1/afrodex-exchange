@@ -1,344 +1,582 @@
-import { useState, useEffect, type ReactNode, type FC } from 'react';
-import { LogOut, Menu, X, Home, Coins, BookOpen, FileText, HelpCircle, type Icon as LucideIcon } from "lucide-react";
+"use client"; // This remains critical for using React hooks like useState and useMemo
 
-// -----------------------------------------------------------
-// 1. INTERFACES (Typescript Setup)
-// -----------------------------------------------------------
+import React, { useState, useMemo } from 'react';
+import {
+  Menu, X, ChevronDown, Clock, Search, Wallet, BarChart, Settings, Repeat2, Zap, ArrowDown, ArrowUp,
+  Coins, LayoutDashboard, History
+} from 'lucide-react';
 
-// Defines the shape of the theme classes for type safety
-interface ThemeClasses {
-    primary: string;
-    background: string;
-    surface: string;
-    surface_light: string;
-    border: string;
-    text: string;
-    text_secondary: string;
-    success: string;
-    error: string;
-}
+// --- Configuration Constants ---
+// NOTE: These constants are now correctly referenced throughout the component.
+const PRIMARY_ACCENT_TEXT = 'text-amber-500';
+const PRIMARY_ACCENT_BG = 'bg-amber-500'; // Correctly defined as PRIMARY_ACCENT_BG
+const PRIMARY_ACTIVE_BG_CLASS = 'bg-amber-600';
+const PRIMARY_HOVER_BG_CLASS = 'hover:bg-amber-600';
+const PRIMARY_BORDER_CLASS = 'border-amber-500';
 
-// Interfaces for the Header Component
-interface WalletConnectProps {
-    onConnect: () => void;
-    themeClasses: ThemeClasses;
-}
+const BUY_TEXT_CLASS = 'text-green-600';
+const BUY_BG_CLASS = 'bg-green-600';
+const SELL_TEXT_CLASS = 'text-red-600';
+const SELL_BG_CLASS = 'bg-red-600';
 
-interface HeaderProps {
-    isConnected: boolean;
-    userAddress: string;
-    onDisconnect: () => void;
-    onConnect: () => void;
-    themeClasses: ThemeClasses;
-}
-
-interface NavItem {
-    name: string;
-    href: string;
-    icon: LucideIcon;
-}
-
-// Interfaces for the Layout Component
-interface LayoutProps {
-    children: ReactNode;
-}
-
-// -----------------------------------------------------------
-// 2. CONSTANTS & UTILS
-// -----------------------------------------------------------
-
-// Utility function for conditional classes
-const cn = (...classes: (string | boolean | undefined)[]): string => classes.filter(Boolean).join(' ');
-
-// Custom Tailwind-style classes mimicking the dark theme
-const themeClasses: ThemeClasses = {
-    'primary': 'text-orange-400', 
-    'background': 'bg-gray-950', 
-    'surface': 'bg-gray-900', 
-    'surface_light': 'bg-gray-800', 
-    'border': 'border-gray-700', 
-    'text': 'text-gray-100', 
-    'text_secondary': 'text-gray-400',
-    'success': 'text-green-500',
-    'error': 'text-red-500',
-};
-
-const navItems: NavItem[] = [
-    { name: "Swap", href: "/", icon: Home },
-    { name: "Markets", href: "/markets", icon: Coins },
-    { name: "Orderbook", href: "/orderbook", icon: BookOpen },
-    { name: "Smart Contract", href: "/contract", icon: FileText },
-    { name: "Help", href: "/help", icon: HelpCircle },
+// 1. Markets Definition (Strictly Limited to 22 Pairs)
+const ALL_MARKETS = [
+    { base: 'AfroX', quote: 'ETH', price: '0.000345', change: 2.15, volume: 154560 },
+    { base: 'AfroX', quote: 'WETH', price: '0.000345', change: 2.15, volume: 154560 },
+    { base: 'AFDLT', quote: 'ETH', price: '0.001200', change: 1.50, volume: 120400 },
+    { base: 'AFDLT', quote: 'WETH', price: '0.001200', change: 1.50, volume: 120400 },
+    { base: 'PFARM', quote: 'ETH', price: '0.000089', change: -1.02, volume: 98750 },
+    { base: 'PFARM', quote: 'WETH', price: '0.000089', change: -1.02, volume: 98750 },
+    { base: 'FREE', quote: 'ETH', price: '0.0000001', change: 0.50, volume: 550000 },
+    { base: 'FREE', quote: 'WETH', price: '0.0000001', change: 0.50, volume: 550000 },
+    { base: 'LWBT', quote: 'ETH', price: '0.000002', change: 3.10, volume: 320000 },
+    { base: 'LWBT', quote: 'WETH', price: '0.000002', change: 3.10, volume: 320000 },
+    { base: 'BUSD', quote: 'ETH', price: '0.000258', change: -0.55, volume: 820000 },
+    { base: 'BUSD', quote: 'WETH', price: '0.000258', change: -0.55, volume: 820000 },
+    { base: 'USDT', quote: 'ETH', price: '0.000259', change: -0.50, volume: 9500000 },
+    { base: 'USDT', quote: 'WETH', price: '0.000259', change: -0.50, volume: 9500000 },
+    { base: 'PLAAS', quote: 'ETH', price: '0.000090', change: 1.20, volume: 99500 },
+    { base: 'PLAAS', quote: 'WETH', price: '0.000090', change: 1.20, volume: 99500 },
+    { base: 'T1C', quote: 'ETH', price: '0.000005', change: 0.00, volume: 15000 },
+    { base: 'T1C', quote: 'WETH', price: '0.000005', change: 0.00, volume: 15000 },
+    { base: '1CT', quote: 'ETH', price: '0.000004', change: -2.10, volume: 12000 },
+    { base: '1CT', quote: 'WETH', price: '0.000004', change: -2.10, volume: 12000 },
+    { base: 'BCT', quote: 'ETH', price: '0.000075', change: 1.05, volume: 45000 },
+    { base: 'BCT', quote: 'WETH', price: '0.000075', change: 1.05, volume: 45000 },
 ];
 
-// -----------------------------------------------------------
-// 3. HEADER COMPONENT (components/header.tsx logic)
-// -----------------------------------------------------------
 
-const WalletConnect: FC<WalletConnectProps> = ({ onConnect, themeClasses }) => {
+// --- Utility Components ---
+
+const Sidebar = ({ isOpen, setIsOpen, setActiveSection }) => {
+    const navItems = [
+        { name: 'Dashboard', icon: LayoutDashboard, section: 'dashboard' },
+        { name: 'Trade', icon: Repeat2, section: 'trade' },
+        { name: 'Swap', icon: Zap, section: 'swap' },
+        { name: 'Liquidity', icon: Coins, section: 'liquidity' },
+        { name: 'Wallet', icon: Wallet, section: 'wallet' },
+        { name: 'History', icon: History, section: 'history' },
+        { name: 'Settings', icon: Settings, section: 'settings' },
+    ];
+
+    const sidebarClass = isOpen
+        ? 'translate-x-0'
+        : '-translate-x-full lg:translate-x-0';
+
     return (
-        <button
-            onClick={onConnect}
-            className={cn(
-                "px-4 py-2 rounded-lg font-bold transition-colors duration-200",
-                "bg-orange-400 text-gray-950 hover:bg-orange-500 shadow-lg",
-                "text-sm sm:text-base whitespace-nowrap"
+        <>
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-70 z-40 lg:hidden"
+                    onClick={() => setIsOpen(false)}
+                ></div>
             )}
-        >
-            Connect Wallet
-        </button>
-    )
-}
+            <div className={`fixed inset-y-0 left-0 w-64 bg-gray-900 text-white z-50 transform transition-transform duration-300 ease-in-out ${sidebarClass} lg:static lg:flex lg:flex-col lg:z-auto`}>
+                <div className="p-4 text-3xl font-black border-b border-gray-700/50 flex justify-between items-center">
+                    <span className={PRIMARY_ACCENT_TEXT}>Afro</span>Dex
+                    <button className="lg:hidden p-1 text-gray-300" onClick={() => setIsOpen(false)}>
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+                <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+                    {navItems.map((item) => (
+                        <a
+                            key={item.name}
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); setActiveSection(item.section); setIsOpen(false); }}
+                            className={`flex items-center p-3 rounded-lg transition duration-150 ${
+                                item.section === 'trade' // Assuming 'trade' is the default active view here
+                                    ? `${PRIMARY_ACTIVE_BG_CLASS} text-gray-900 font-bold shadow-lg` // Fixed color class
+                                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                            }`}
+                        >
+                            <item.icon className="w-5 h-5 mr-3" />
+                            {item.name}
+                        </a>
+                    ))}
+                </nav>
+            </div>
+        </>
+    );
+};
 
-const Header: FC<HeaderProps> = ({ isConnected, userAddress, onDisconnect, onConnect, themeClasses }) => {
-    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+// --- Market List Component ---
 
-    const displayAddress = (address: string): string => {
-        if (!address) return "";
-        return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+const MarketList = ({ markets, currentPair, setCurrentPair }) => {
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredMarkets = markets.filter(market =>
+        `${market.base}/${market.quote}`.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const formatPrice = (priceStr) => {
+        const price = parseFloat(priceStr);
+        if (isNaN(price)) return '0.00';
+        // Use exponential notation for very small numbers, otherwise format normally
+        if (price > 0 && price < 0.0001) {
+            return price.toExponential(2);
+        }
+        return price.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 8
+        });
     };
+
+    return (
+        <div className="bg-gray-900 text-gray-100 flex flex-col h-full rounded-lg shadow-xl overflow-hidden">
+            <div className="p-3 border-b border-gray-700">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input
+                        type="text"
+                        placeholder="Search markets..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className={`w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:ring-1 ${PRIMARY_BORDER_CLASS} focus:${PRIMARY_BORDER_CLASS}`}
+                    />
+                </div>
+            </div>
+
+            <div className="flex text-xs font-medium text-gray-400 border-b border-gray-700 px-3 py-2 uppercase">
+                <span className="w-1/3">Pair</span>
+                <span className="w-1/3 text-right">Price</span>
+                <span className="w-1/3 text-right">Change (24h)</span>
+            </div>
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+                {filteredMarkets.length > 0 ? (
+                    filteredMarkets.map((market, index) => {
+                        const isCurrent = market.base === currentPair.base && market.quote === currentPair.quote;
+                        const isPositive = market.change >= 0;
+                        const changeColor = isPositive ? 'text-green-500' : 'text-red-500';
+
+                        return (
+                            <div
+                                key={index}
+                                className={`flex items-center text-sm font-medium cursor-pointer transition duration-150 p-3 hover:bg-gray-800 ${isCurrent ? `bg-gray-800 border-l-4 ${PRIMARY_BORDER_CLASS}` : ''}`}
+                                onClick={() => setCurrentPair(market)}
+                            >
+                                <span className="w-1/3 text-white">{market.base}/<span className="text-gray-400">{market.quote}</span></span>
+                                <span className="w-1/3 text-right text-white">{formatPrice(market.price)}</span>
+                                <span className={`w-1/3 text-right ${changeColor}`}>{isPositive ? '+' : ''}{market.change.toFixed(2)}%</span>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className="p-4 text-center text-gray-500">No markets found.</div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// --- Order Book Component ---
+
+const OrderBook = ({ currentPair }) => {
+    // Mock data for Order Book
+    const mockBids = useMemo(() => [
+        { price: 3849.50, amount: 0.5, total: 1924.75 },
+        { price: 3849.40, amount: 1.2, total: 4619.28 },
+        { price: 3849.30, amount: 2.1, total: 8083.53 },
+        { price: 3849.20, amount: 0.8, total: 3079.36 },
+        { price: 3849.10, amount: 3.5, total: 13471.85 },
+    ], []);
+    const mockAsks = useMemo(() => [
+        { price: 3850.50, amount: 1.0, total: 3850.50 },
+        { price: 3850.60, amount: 0.7, total: 2695.42 },
+        { price: 3850.70, amount: 1.5, total: 5776.05 },
+        { price: 3850.80, amount: 2.3, total: 8856.84 },
+        { price: 3850.90, amount: 0.4, total: 1540.36 },
+    ], []);
+
+    const [decimalPlaces, setDecimalPlaces] = useState(2); // For price aggregation
+
+    const formatValue = (value) => value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+
+    const maxTotal = Math.max(
+        ...mockBids.map(b => b.total),
+        ...mockAsks.map(a => a.total)
+    );
+
+    return (
+        <div className="bg-gray-900 text-gray-100 flex flex-col h-full rounded-lg shadow-xl overflow-hidden">
+            <div className="p-3 border-b border-gray-700 flex justify-between items-center">
+                <h3 className="font-semibold text-lg">Order Book</h3>
+                <div className="flex items-center text-xs space-x-2">
+                    <span className="text-gray-400">Group:</span>
+                    <button className={`p-1 rounded text-gray-400 bg-gray-800 hover:bg-gray-700 transition`}>
+                        {decimalPlaces} Decimals <ChevronDown className="w-3 h-3 inline ml-1" />
+                    </button>
+                    <Clock className="w-4 h-4 text-gray-500" />
+                </div>
+            </div>
+
+            <div className="flex text-xs font-medium text-gray-400 border-b border-gray-700 px-3 py-2 uppercase">
+                <span className="w-1/3 text-left">Price ({currentPair.quote})</span>
+                <span className="w-1/3 text-right">Amount ({currentPair.base})</span>
+                <span className="w-1/3 text-right">Total ({currentPair.quote})</span>
+            </div>
+
+            <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Asks (Sells) */}
+                <div className="flex-1 overflow-y-auto order-book-asks custom-scrollbar">
+                    {mockAsks.slice().reverse().map((order, index) => (
+                        <div
+                            key={`ask-${index}`}
+                            className="flex text-sm p-1.5 font-mono relative cursor-pointer hover:bg-red-900/20 transition"
+                        >
+                            {/* Visual depth bar - red for sells */}
+                            <div className="absolute inset-y-0 right-0 bg-red-600/10" style={{ width: `${(order.total / maxTotal) * 100}%` }}></div>
+                            
+                            <span className={`w-1/3 text-left ${SELL_TEXT_CLASS} z-10`}>{formatValue(order.price)}</span>
+                            <span className="w-1/3 text-right text-gray-300 z-10">{formatValue(order.amount)}</span>
+                            <span className="w-1/3 text-right text-gray-400 text-xs z-10">{formatValue(order.total)}</span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Last Trade Price */}
+                <div className="p-2 bg-gray-800 text-center font-bold text-xl cursor-default transition duration-300">
+                    <span className={PRIMARY_ACCENT_TEXT}>{formatValue(3850.00)}</span>
+                    <span className="text-sm text-gray-500 ml-2">({currentPair.quote})</span>
+                </div>
+
+                {/* Bids (Buys) */}
+                <div className="flex-1 overflow-y-auto order-book-bids custom-scrollbar">
+                    {mockBids.map((order, index) => (
+                        <div
+                            key={`bid-${index}`}
+                            className="flex text-sm p-1.5 font-mono relative cursor-pointer hover:bg-green-900/20 transition"
+                        >
+                            {/* Visual depth bar - green for buys */}
+                            <div className="absolute inset-y-0 right-0 bg-green-600/10" style={{ width: `${(order.total / maxTotal) * 100}%` }}></div>
+                            
+                            <span className={`w-1/3 text-left ${BUY_TEXT_CLASS} z-10`}>{formatValue(order.price)}</span>
+                            <span className="w-1/3 text-right text-gray-300 z-10">{formatValue(order.amount)}</span>
+                            <span className="w-1/3 text-right text-gray-400 text-xs z-10">{formatValue(order.total)}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Trade Form Component (Simplified) ---
+
+const TradeForm = ({ currentPair }) => {
+    const [tradeType, setTradeType] = useState('Limit'); // Limit or Market
+    const [side, setSide] = useState('Buy'); // Buy or Sell
+
+    const getButtonClasses = (currentSide) => {
+        const baseClasses = "flex-1 py-3 text-lg font-bold transition duration-200 rounded-lg";
+        if (currentSide === 'Buy') {
+            return side === 'Buy'
+                ? `${BUY_BG_CLASS} text-white shadow-xl shadow-green-900/30`
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700';
+        } else {
+            return side === 'Sell'
+                ? `${SELL_BG_CLASS} text-white shadow-xl shadow-red-900/30`
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700';
+        }
+    };
+
+    const inputStyle = `w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-1 ${PRIMARY_BORDER_CLASS} focus:${PRIMARY_BORDER_CLASS}`;
+
+    return (
+        <div className="bg-gray-900 text-gray-100 flex flex-col p-4 rounded-lg shadow-xl">
+            {/* Buy/Sell Toggles */}
+            <div className="flex space-x-2 mb-4">
+                <button
+                    onClick={() => setSide('Buy')}
+                    className={getButtonClasses('Buy')}
+                >
+                    Buy {currentPair.base}
+                </button>
+                <button
+                    onClick={() => setSide('Sell')}
+                    className={getButtonClasses('Sell')}
+                >
+                    Sell {currentPair.base}
+                </button>
+            </div>
+
+            {/* Limit/Market Toggles */}
+            <div className="flex space-x-2 mb-6 text-sm">
+                {['Limit', 'Market', 'Stop Limit'].map(type => (
+                    <button
+                        key={type}
+                        onClick={() => setTradeType(type)}
+                        className={`py-1 px-3 rounded-full transition duration-150 ${
+                            tradeType === type
+                                ? `${PRIMARY_ACCENT_BG} text-gray-900 font-semibold`
+                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                        }`}
+                    >
+                        {type}
+                    </button>
+                ))}
+            </div>
+
+            {/* Trade Inputs */}
+            <div className="space-y-4">
+                {tradeType !== 'Market' && (
+                    <div className="relative">
+                        <label className="text-xs text-gray-400 block mb-1">Price ({currentPair.quote})</label>
+                        <input type="number" placeholder="0.00" defaultValue="3850.00" className={inputStyle} />
+                        <span className="absolute right-3 top-9 text-gray-500 text-sm">MAX</span>
+                    </div>
+                )}
+                
+                <div className="relative">
+                    <label className="text-xs text-gray-400 block mb-1">Amount ({currentPair.base})</label>
+                    <input type="number" placeholder="0.00" className={inputStyle} />
+                    <span className="absolute right-3 top-9 text-gray-500 text-sm">MAX</span>
+                </div>
+                
+                <div className="relative">
+                    <label className="text-xs text-gray-400 block mb-1">Total ({currentPair.quote})</label>
+                    <input type="number" placeholder="0.00" className={inputStyle} />
+                </div>
+            </div>
+
+            <div className="flex justify-between items-center text-sm text-gray-400 mt-4 border-t border-gray-800 pt-3">
+                <span>Available:</span>
+                <span className="font-medium">12.345 {currentPair.quote}</span>
+            </div>
+
+            <button
+                className={`w-full mt-6 py-3 text-lg font-extrabold text-white rounded-lg transition duration-200 ${
+                    side === 'Buy' ? `${BUY_BG_CLASS} hover:bg-green-700` : `${SELL_BG_CLASS} hover:bg-red-700`
+                }`}
+            >
+                {side} {currentPair.base}
+            </button>
+        </div>
+    );
+};
+
+// --- Main Trading View Component ---
+
+const TradingView = ({ currentPair }) => {
+    // Mock Price Data
+    const isPositive = currentPair.change >= 0;
+    const priceColor = isPositive ? 'text-green-500' : 'text-red-500';
+    const arrowIcon = isPositive ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />;
     
-    const handleDisconnect = (): void => {
-        onDisconnect();
-        setIsMenuOpen(false);
+    const formatPrice = (priceStr) => {
+        const price = parseFloat(priceStr);
+        if (isNaN(price)) return '0.00';
+        if (price > 0 && price < 0.0001) {
+            return price.toExponential(2);
+        }
+        return price.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 8
+        });
+    };
+
+    return (
+        <div className="flex flex-col h-full space-y-4">
+            {/* Header / Ticker Bar */}
+            <div className="bg-gray-900 p-4 rounded-lg shadow-xl flex flex-wrap items-center justify-between border-b border-gray-800">
+                <div className="flex items-center space-x-4">
+                    <h2 className="text-3xl font-extrabold text-white">{currentPair.base}/{currentPair.quote}</h2>
+                    <div className="flex flex-col">
+                        <span className={`text-4xl font-extrabold ${priceColor} flex items-center`}>
+                            {formatPrice(currentPair.price)}
+                        </span>
+                        <span className="text-sm text-gray-500">Last Price ({currentPair.quote})</span>
+                    </div>
+                </div>
+
+                <div className="flex items-center space-x-6 text-sm font-medium text-gray-400 mt-4 lg:mt-0">
+                    <div>
+                        <span className="block text-xs uppercase">24h Change</span>
+                        <span className={`flex items-center ${priceColor} font-bold`}>
+                            {arrowIcon} {currentPair.change.toFixed(2)}%
+                        </span>
+                    </div>
+                    <div>
+                        <span className="block text-xs uppercase">24h High</span>
+                        <span className="text-white font-bold">4000.00</span>
+                    </div>
+                    <div>
+                        <span className="block text-xs uppercase">24h Low</span>
+                        <span className="text-white font-bold">3750.50</span>
+                    </div>
+                    <div>
+                        <span className="block text-xs uppercase">24h Volume ({currentPair.base})</span>
+                        <span className="text-white font-bold">{currentPair.volume.toLocaleString()}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Chart Area */}
+            <div className="bg-gray-900 flex-1 rounded-lg shadow-xl flex items-center justify-center p-4">
+                <BarChart className={`w-16 h-16 ${PRIMARY_ACCENT_TEXT} opacity-50`} />
+                <span className="text-gray-600 text-lg ml-3">Chart Placeholder (Powered by TradingView)</span>
+            </div>
+
+            {/* Open Orders / Trade History */}
+            <div className="bg-gray-900 p-4 rounded-lg shadow-xl">
+                <div className="flex space-x-4 border-b border-gray-700 mb-3">
+                    {['Open Orders (0)', 'Trade History', 'Fills'].map(tab => (
+                        <button
+                            key={tab}
+                            className={`pb-2 text-sm font-semibold transition duration-150 ${
+                                tab === 'Open Orders (0)' 
+                                    ? `${PRIMARY_ACCENT_TEXT} border-b-2 ${PRIMARY_BORDER_CLASS}` 
+                                    : 'text-gray-500 hover:text-white'
+                            }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+                <div className="text-center text-gray-500 py-6 text-sm">
+                    No recent orders or trades for {currentPair.base}/{currentPair.quote}.
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Main App Component ---
+
+const App = () => {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [activeSection, setActiveSection] = useState('trade'); // Default to 'trade'
+    const [currentPair, setCurrentPair] = useState(ALL_MARKETS.find(m => m.base === 'AfroX' && m.quote === 'ETH') || ALL_MARKETS[0]);
+
+    // This logic handles switching views (e.g., to Dashboard, Wallet)
+    if (activeSection !== 'trade') {
+        return (
+            <div className="min-h-screen bg-gray-100 font-sans flex antialiased">
+                <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} setActiveSection={setActiveSection} />
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <header className="bg-white shadow-sm p-4 lg:p-6 flex justify-between items-center border-b border-gray-200">
+                        <button
+                            className="text-gray-600 lg:hidden p-2 rounded-lg hover:bg-gray-100 transition"
+                            onClick={() => setIsSidebarOpen(true)}
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+                        <h1 className="text-2xl font-extrabold text-gray-800 capitalize">{activeSection}</h1>
+                        <div className="flex items-center space-x-3">
+                            <button className={`text-sm font-medium ${PRIMARY_ACCENT_BG} text-gray-900 px-4 py-2 rounded-full shadow-md ${PRIMARY_HOVER_BG_CLASS} transition duration-150`}>
+                                Connect Wallet
+                            </button>
+                            <div className={`w-10 h-10 ${PRIMARY_ACCENT_BG} rounded-full flex items-center justify-center text-gray-900 font-bold text-lg`}>
+                                EA
+                            </div>
+                        </div>
+                    </header>
+                    <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
+                        <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-gray-400">
+                            <h2 className="text-3xl font-bold text-gray-800 capitalize">{activeSection} View</h2>
+                            <p className="text-gray-500 mt-1">Placeholder content for the {activeSection} section.</p>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        );
     }
 
+    // --- Main Trading Interface ---
     return (
-        <header className={cn(
-            themeClasses.surface, 
-            themeClasses.border,
-            "border-b shadow-md sticky top-0 z-10", 
-            isMenuOpen && "z-30"
-        )}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-20">
-                    
-                    {/* Logo Section */}
-                    <div className="flex-shrink-0">
-                        <a href="/" className="flex items-center space-x-2">
-                            <img 
-                                src="/afrodex-logo.png" 
-                                alt="AfroDEX Logo" 
-                                className="h-10 w-auto rounded-md"
-                                onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = "https://placehold.co/150x40/000000/F97316?text=AfroDEX"; 
-                                }}
-                            />
-                            <div> 
-                                <h1 className={cn("text-xl font-bold leading-tight", themeClasses.primary)}>AfroDEX</h1>
-                                <p className={cn("text-xs italic leading-tight hidden sm:block", themeClasses.text_secondary)}>...Africa's biggest DEX</p>
-                            </div>
-                        </a>
-                    </div>
+        <div className="min-h-screen bg-gray-950 font-sans flex antialiased text-gray-100">
+            {/* This <style> block is necessary for Tailwind's JIT compiler 
+              to recognize the dynamically constructed class names.
+            */}
+            <style jsx global>{`
+                /* Custom styles for Tailwind's JIT mode, explicitly defining custom colors */
+                .text-amber-500 { color: #f59e0b; }
+                .bg-amber-500 { background-color: #f59e0b; }
+                .border-amber-500 { border-color: #f59e0b; }
+                .bg-amber-600 { background-color: #d97706; }
+                .hover\\:bg-amber-600:hover { background-color: #d97706; }
 
-                    {/* Desktop Navigation & Wallet Button */}
-                    <div className="hidden lg:flex items-center space-x-6">
-                        <nav className="flex space-x-4">
-                            {navItems.map((item) => (
-                                <a
-                                    key={item.name}
-                                    href={item.href}
-                                    className={cn("hover:text-primary transition-colors duration-200 font-medium p-2 rounded-md", themeClasses.text_secondary)}
-                                >
-                                    {item.name}
-                                </a>
-                            ))}
-                        </nav>
-                        
-                        <div className="ml-4 flex items-center">
-                            {isConnected ? (
-                                <div className={cn("flex items-center space-x-3 rounded-full p-1 border", themeClasses.surface_light, themeClasses.border)}>
-                                    <span className="bg-green-700/30 text-green-400 px-3 py-1 rounded-full text-sm font-semibold">
-                                        {displayAddress(userAddress)}
-                                    </span>
-                                    <button 
-                                        onClick={handleDisconnect}
-                                        className="p-2 rounded-full text-red-500 hover:bg-red-900/20 transition-colors"
-                                        title="Disconnect Wallet"
-                                    >
-                                        <LogOut className="h-5 w-5" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <WalletConnect onConnect={onConnect} themeClasses={themeClasses} />
-                            )}
-                        </div>
-                    </div>
+                .text-green-600 { color: #059669; }
+                .bg-green-600 { background-color: #059669; }
+                .hover\\:bg-green-700:hover { background-color: #047857; }
 
-                    {/* Mobile Menu Button */}
-                    <div className="lg:hidden">
-                        <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className={cn("p-2 rounded-lg hover:bg-gray-800 transition-colors", themeClasses.text_secondary)}
-                        >
-                            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                .text-red-600 { color: #dc2626; }
+                .bg-red-600 { background-color: #dc2626; }
+                .hover\\:bg-red-700:hover { background-color: #b91c1c; }
+
+                /* Custom scrollbar styling for the dark theme */
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: #1f2937; /* gray-800 */
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #4b5563; /* gray-600 */
+                    border-radius: 3px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #6b7280; /* gray-500 */
+                }
+            `}</style>
+            
+            <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} setActiveSection={setActiveSection} />
+
+            <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Top Header/Nav (Mobile) */}
+                <header className="bg-gray-900 shadow-xl p-3 flex justify-between items-center border-b border-gray-800 lg:hidden">
+                    <button
+                        className="text-gray-300 p-2 rounded-lg hover:bg-gray-800 transition"
+                        onClick={() => setIsSidebarOpen(true)}
+                    >
+                        <Menu className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-xl font-bold text-white">
+                        <span className={PRIMARY_ACCENT_TEXT}>Afro</span>Dex
+                    </h1>
+                    <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium text-gray-400 hidden sm:inline">{currentPair.base}/{currentPair.quote}</span>
+                        <button className={`text-sm font-medium ${PRIMARY_ACCENT_BG} text-gray-900 px-3 py-1.5 rounded-full ${PRIMARY_HOVER_BG_CLASS}`}>
+                            Wallet
                         </button>
                     </div>
-                </div>
-            </div>
+                </header>
 
-            {/* Mobile Menu Content */}
-            <div 
-                className={cn(
-                    "lg:hidden absolute w-full shadow-lg transition-all duration-300 ease-in-out overflow-hidden z-20 border-t",
-                    themeClasses.surface, 
-                    themeClasses.border,
-                    isMenuOpen ? "max-h-96 opacity-100 py-2" : "max-h-0 opacity-0"
-                )}
-            >
-                <div className="px-4 pt-2 pb-4 space-y-1 sm:px-6">
-                    {navItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                            <a
-                                key={item.name}
-                                href={item.href}
-                                onClick={() => setIsMenuOpen(false)}
-                                className={cn(
-                                    "flex items-center space-x-3 px-3 py-3 rounded-md text-base font-medium transition-colors", 
-                                    themeClasses.text_secondary, 
-                                    "hover:bg-gray-800 hover:text-orange-400"
-                                )}
-                            >
-                                <Icon className="h-5 w-5" />
-                                <span>{item.name}</span>
-                            </a>
-                        );
-                    })}
-                    
-                    {/* Mobile Wallet Status */}
-                    <div className="pt-4 border-t mt-4" style={{ borderColor: themeClasses.border.split('-').pop() }}>
-                        {isConnected ? (
-                            <div className="flex flex-col space-y-2 p-2">
-                                <span className={cn("text-sm font-medium", themeClasses.text_secondary)}>
-                                    Connected: <span className="text-green-500 font-semibold">{displayAddress(userAddress)}</span>
-                                </span>
-                                <button 
-                                    onClick={handleDisconnect}
-                                    className="flex items-center justify-center w-full px-3 py-3 border border-red-500 rounded-md text-red-500 text-base font-medium hover:bg-red-900/10 transition-colors mt-2"
-                                >
-                                    <LogOut className="h-5 w-5 mr-2" /> Disconnect
-                                </button>
+                {/* Main Grid Layout (Desktop) */}
+                <main className="flex-1 overflow-x-hidden overflow-y-auto p-3 lg:p-4">
+                    <div className="grid grid-cols-12 gap-3 lg:gap-4 h-full">
+
+                        {/* Markets List (Col 1: 3/12 wide) */}
+                        <div className="col-span-full md:col-span-4 lg:col-span-3 h-[400px] md:h-full order-1">
+                            <MarketList 
+                                markets={ALL_MARKETS} 
+                                currentPair={currentPair} 
+                                setCurrentPair={setCurrentPair} 
+                            />
+                        </div>
+
+                        {/* Trading View (Col 2: 6/12 wide) */}
+                        <div className="col-span-full md:col-span-8 lg:col-span-6 h-full order-2 flex flex-col">
+                            <TradingView currentPair={currentPair} />
+                        </div>
+
+                        {/* Order Book & Trade Form (Col 3: 3/12 wide) */}
+                        <div className="col-span-full lg:col-span-3 h-full flex flex-col space-y-3 lg:space-y-4 order-3">
+                            <div className="flex-1 min-h-[300px]">
+                                <OrderBook currentPair={currentPair} />
                             </div>
-                        ) : (
-                            <div className="p-2">
-                                <WalletConnect onConnect={onConnect} themeClasses={themeClasses} />
-                            </div>
-                        )}
+                            <TradeForm currentPair={currentPair} />
+                        </div>
+
                     </div>
-                </div>
-            </div>
-        </header>
-    );
-}
-
-// -----------------------------------------------------------
-// 4. PAGE COMPONENT (app/page.tsx logic)
-// -----------------------------------------------------------
-
-// Placeholder for the main Swap Card component
-const SwapCardPlaceholder: FC = () => (
-    <div className="w-full max-w-md p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700 space-y-4">
-        <h4 className="text-xl font-semibold text-gray-100">Swap Interface</h4>
-        <div className="min-h-[200px] flex items-center justify-center border border-dashed border-gray-600 rounded-lg p-6">
-            <p className="text-gray-500 italic">
-                [Swap Card Component would be rendered here]
-            </p>
-        </div>
-        <button className="w-full py-3 bg-orange-400 text-gray-900 font-bold rounded-lg hover:bg-orange-500 transition">
-            Start Swapping
-        </button>
-    </div>
-);
-
-
-const Page: FC = () => {
-    return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <h2 className="text-3xl font-bold text-gray-100 mb-4">Seamless Decentralized Asset Exchange</h2>
-            <p className="text-lg text-gray-400 mb-8">
-                Trade crypto assets instantly and efficiently on AfroDEX.
-            </p>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 flex justify-center p-6 rounded-xl">
-                    <SwapCardPlaceholder />
-                </div>
-
-                <div className="lg:col-span-1 p-6 bg-gray-900 rounded-xl shadow-2xl border border-gray-700 h-fit">
-                    <h3 className="text-xl font-semibold text-gray-100 mb-4 border-b border-gray-800 pb-2">Market Overview</h3>
-                    <ul className="space-y-3 text-sm text-gray-400">
-                        <li className="flex justify-between"><span>Total Liquidity:</span><span className="text-green-400 font-medium">$2.5M</span></li>
-                        <li className="flex justify-between"><span>24h Volume:</span><span className="text-green-400 font-medium">$450K</span></li>
-                        <li className="flex justify-between"><span>Top Pair:</span><span className="text-orange-400 font-medium">ETH / USDC</span></li>
-                        <li className="flex justify-between"><span>Active Traders:</span><span className="font-medium">1,234</span></li>
-                    </ul>
-                    <div className="mt-6 p-4 bg-gray-800/50 rounded-lg">
-                       <p className="text-xs text-gray-400">Trading involves risk. All prices are for informational purposes only.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-
-// -----------------------------------------------------------
-// 5. ROOT LAYOUT COMPONENT (app/layout.tsx logic)
-// -----------------------------------------------------------
-
-export default function App() {
-    // Global Wallet State Management (from layout.tsx)
-    const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [userAddress, setUserAddress] = useState<string>(''); 
-
-    useEffect(() => {
-        // Mocking an initial connection check/restoration
-        const storedAddress: string = "0x89d24A6b4CcB2EdB6bA4d9eE7de73e86f9cFD9bF"; 
-        if (storedAddress) {
-            setIsConnected(true);
-            setUserAddress(storedAddress);
-        }
-    }, []);
-
-    const handleDisconnect = (): void => {
-        setIsConnected(false);
-        setUserAddress('');
-        console.log("Wallet disconnected.");
-    };
-
-    const handleConnect = (): void => {
-        setIsConnected(true);
-        setUserAddress('0xAfroA6b4CcB2EdB6bA4d9eE7de73e86f9cFD9bF'); 
-        console.log("Wallet connected.");
-    };
-
-    return (
-        <div className={cn(
-            "min-h-screen antialiased font-sans", 
-            themeClasses.background, 
-            themeClasses.text,
-        )}>
-            
-            {/* Header Component */}
-            <Header 
-                isConnected={isConnected} 
-                userAddress={userAddress} 
-                onDisconnect={handleDisconnect} 
-                onConnect={handleConnect}
-                themeClasses={themeClasses}
-            />
-
-            {/* Page Content */}
-            <main className="flex-grow">
-                <Page />
-            </main>
-
-            <footer className={cn("py-4 text-center text-xs border-t mt-12", themeClasses.text_secondary, themeClasses.border)}>
+                </main>
+                <footer className={cn("py-4 text-center text-xs border-t mt-12", themeClasses.text_secondary, themeClasses.border)}>
               &copy; 2019-Present AfroDEX - Pioneering the future of decentralized finance.
             </footer>
+            </div>
         </div>
     );
-}
+};
 
+export default App;
