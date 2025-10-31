@@ -1,25 +1,16 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getUserTrades } from "@/lib/db"
+// THIS FILE IS A TEMPORARY PLACEHOLDER
+// It ensures a clean production build by removing imports that rely on missing backend modules.
 
-export async function GET(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams
-    const userAddress = searchParams.get("address")
-    const limit = searchParams.get("limit") || "50"
+import { NextResponse } from "next/server";
 
-    if (!userAddress) {
-      return NextResponse.json({ error: "User address is required" }, { status: 400 })
-    }
+export async function POST() {
+    console.error("API Route functionality is disabled in this environment build.");
+    return NextResponse.json(
+        { error: "Backend logic dependencies are missing. Functionality is disabled." },
+        { status: 501 } // 501 Not Implemented
+    );
+}
 
-    const trades = await getUserTrades(userAddress, Number.parseInt(limit))
-
-    return NextResponse.json({
-      userAddress,
-      trades,
-      count: trades.length,
-    })
-  } catch (error: any) {
-    console.error("[v0] History error:", error)
-    return NextResponse.json({ error: error.message || "Failed to fetch history" }, { status: 500 })
-  }
+export async function GET() {
+    return POST(); // Use the same disabled response for GET requests
 }
