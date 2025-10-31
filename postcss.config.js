@@ -1,9 +1,9 @@
-/** @type {import('postcss-load-config').Config} */
 module.exports = {
   plugins: {
-    // Tailwind CSS must be the first plugin
+    // This loads the Tailwind CSS plugin, which is necessary to process your utility classes.
     tailwindcss: {},
-    // Autoprefixer is necessary for cross-browser compatibility
+    
+    // This adds vendor prefixes to CSS rules, ensuring cross-browser compatibility.
     autoprefixer: {},
   },
-}
+};
