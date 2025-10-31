@@ -571,6 +571,9 @@ const App = () => {
 
                     </div>
                 </main>
+                <footer className={cn("py-4 text-center text-xs border-t mt-12", themeClasses.text_secondary, themeClasses.border)}>
+              &copy; 2019-Present AfroDEX - Pioneering the future of decentralized finance.
+            </footer>
             </div>
         </div>
     );
