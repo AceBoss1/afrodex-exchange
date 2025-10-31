@@ -1,40 +1,30 @@
-// THIS FILE IS A TEMPORARY PLACEHOLDER
-// It replaces the original complex code that relied on missing modules (e.g., @/lib/contract)
-// This ensures a clean production build while focusing on the frontend.
+import React from 'react';
+import { Repeat2 } from 'lucide-react';
 
-import { NextResponse } from "next/server";
+// NOTE: This page is simplified to compile cleanly and avoid module not found errors.
+// The main trading logic is in app/exchange/page.jsx
 
-export async function POST() {
-    console.error("API Route is disabled in this build configuration.");
-    return NextResponse.json(
-        { error: "Internal API dependencies are missing. Backend logic is disabled." }, 
-        { status: 501 } // Not Implemented
-    );
+const PRIMARY_ACCENT_BG = 'bg-amber-500';
+const PRIMARY_HOVER_BG_CLASS = 'hover:bg-amber-600';
+
+export default function Home() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-950 text-white p-8">
+      <div className="text-center space-y-6 max-w-lg">
+        <Repeat2 className={`w-16 h-16 mx-auto text-amber-500`} />
+        <h1 className="text-4xl font-extrabold tracking-tight">
+          Welcome to <span className="text-amber-500">AfroDex</span>
+        </h1>
+        <p className="text-gray-400 text-lg">
+          The hub for African Decentralized Finance. Navigate to the Exchange to begin trading.
+        </p>
+        <a
+          href="/exchange"
+          className={`inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-gray-900 ${PRIMARY_ACCENT_BG} ${PRIMARY_HOVER_BG_CLASS} transition duration-150 ease-in-out`}
+        >
+          Go to Trading Exchange
+        </a>
+      </div>
+    </div>
+  );
 }
-
-export async function GET() {
-    return POST(); // Use the same disabled response for GET requests
-}
-```
-
-Please apply this placeholder logic to all the failing API files mentioned in your log:
-
-1.  `./app/api/balance/route.ts`
-2.  `./app/api/deposit/route.ts`
-3.  `./app/api/orders/create/route.ts`
-4.  `./app/api/price/route.ts`
-5.  `./app/api/trade/route.ts`
-6.  `./app/api/history/route.ts`
-
----
-
-## Summary of Next Steps
-
-1.  **Install Dependencies:** Run `npm install -D tailwindcss postcss autoprefixer`. (If you still hit `ECONNRESET`, try the HTTP registry workaround.)
-2.  **Replace `app/page.tsx`:** Use the simplified code provided above.
-3.  **Replace API Routes:** Update the content of all 6 failing `app/api/.../route.ts` files with the simple placeholder structure to remove the broken imports.
-4.  **Final Clean Build:**
-    ```bash
-    rm -rf .next
-    npm run build
-    
