@@ -6,7 +6,11 @@ import { LogOut, Menu, X, Coins, BookOpen, FileText, HelpCircle, User, Zap, Acti
 // --- FIREBASE IMPORTS ---
 // IMPORTANT: These are dynamically provided global variables in the execution environment.
 // We must check if they exist before parsing/using them.
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+// FIX: Clean the rawAppId. Firestore paths must have an odd number of segments.
+// The environment often provides __app_id with slashes (e.g., c_.../app/page.tsx-442), which breaks the path count.
+// We extract only the base unique ID (the first segment).
+const appId = rawAppId.split('/')[0] || 'default-app-id';
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
 
 // Only attempt to load Firebase modules if the config is available to prevent runtime errors
@@ -21,6 +25,9 @@ let query: any;
 let where: any;
 let onSnapshot: any;
 let setDoc: any;
+
+// Flag to track if Firebase modules were successfully required
+let firebaseModulesLoaded = false;
 
 try {
   // We use require here as imports cannot be conditional in React/Next.js environments
@@ -40,9 +47,11 @@ try {
   where = firebaseFirestoreModule.where;
   onSnapshot = firebaseFirestoreModule.onSnapshot;
   setDoc = firebaseFirestoreModule.setDoc;
-
+  
+  firebaseModulesLoaded = true; // Set flag to true on success
 } catch (e) {
-  // console.error("Firebase module import error. This is expected if running outside the Canvas environment.", e);
+  console.error("Firebase module import error. Data persistence is disabled.", e);
+  // Variables remain undefined/null if the require fails
 }
 
 
@@ -91,14 +100,15 @@ export default function DEXApp() {
 
   // 1. FIREBASE INITIALIZATION & AUTHENTICATION
   useEffect(() => {
-    if (!firebaseConfig || !initializeApp || !getAuth || !getFirestore) {
-      // Firebase libraries couldn't be loaded or config is missing.
+    // Only proceed if modules were successfully loaded AND config is present
+    if (!firebaseModulesLoaded || !firebaseConfig) {
       console.error("Firebase dependencies or config missing. Data persistence is disabled.");
       setAuthReady(true);
       return;
     }
 
     try {
+      // NOTE: InitializeApp is guaranteed to be a function here due to firebaseModulesLoaded check
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
       const auth = getAuth(app);
@@ -117,7 +127,8 @@ export default function DEXApp() {
         const currentUserId = auth.currentUser?.uid || crypto.randomUUID();
         setUserId(currentUserId);
         setAuthReady(true);
-        console.log("Firebase initialized. User ID:", currentUserId);
+        console.log("Firebase initialized. Clean User ID:", currentUserId);
+        console.log("Clean App ID used for pathing:", appId);
       };
 
       authenticate();
@@ -132,36 +143,44 @@ export default function DEXApp() {
     // Ensure all necessary dependencies are loaded before subscribing
     if (!authReady || !dbInstance || !collection || !query || !onSnapshot) return;
 
+    // FIX APPLIED HERE: appId is already cleaned up at the top level
     const tradesPath = `artifacts/${appId}/public/data/trades`;
-    const q = query(collection(dbInstance, tradesPath));
+    
+    try {
+        const q = query(collection(dbInstance, tradesPath));
 
-    // Listen for real-time updates on trades
-    const unsubscribe = onSnapshot(q, (snapshot: any) => {
-        const tradesData: Trade[] = [];
-        snapshot.forEach((doc: any) => {
-            const data = doc.data();
-            // Basic validation to ensure all expected fields exist
-            if (data.pair && data.type && data.price !== undefined && data.amount !== undefined && data.time !== undefined) {
-                tradesData.push({ 
-                    id: doc.id,
-                    pair: data.pair,
-                    type: data.type,
-                    price: data.price,
-                    amount: data.amount,
-                    time: data.time 
-                });
-            }
+        // Listen for real-time updates on trades
+        const unsubscribe = onSnapshot(q, (snapshot: any) => {
+            const tradesData: Trade[] = [];
+            snapshot.forEach((doc: any) => {
+                const data = doc.data();
+                // Basic validation to ensure all expected fields exist
+                if (data.pair && data.type && data.price !== undefined && data.amount !== undefined && data.time !== undefined) {
+                    tradesData.push({ 
+                        id: doc.id,
+                        pair: data.pair,
+                        type: data.type,
+                        price: data.price,
+                        amount: data.amount,
+                        time: data.time 
+                    });
+                }
+            });
+            // Sort by time descending and only keep the last 20
+            tradesData.sort((a, b) => b.time - a.time);
+            setRecentTrades(tradesData.slice(0, 20));
+            console.log("Fetched trades:", tradesData.length);
+        }, (error: any) => {
+            console.error("Error fetching trades:", error);
         });
-        // Sort by time descending and only keep the last 20
-        tradesData.sort((a, b) => b.time - a.time);
-        setRecentTrades(tradesData.slice(0, 20));
-        console.log("Fetched trades:", tradesData.length);
-    }, (error: any) => {
-        console.error("Error fetching trades:", error);
-    });
 
-    // Clean up the listener on component unmount
-    return () => unsubscribe();
+        // Clean up the listener on component unmount
+        return () => unsubscribe();
+    } catch (e) {
+        console.error("Error setting up trades snapshot listener (Likely a path/permission issue):", e);
+        // Return a dummy cleanup function if setup failed
+        return () => {}; 
+    }
   }, [authReady, dbInstance]);
 
 
@@ -458,7 +477,6 @@ export default function DEXApp() {
       </div>
 
       {/* Trade List */}
-      {/* Note: 'custom-scrollbar' class is now defined in app/globals.css */}
       <div className="flex-grow overflow-y-auto custom-scrollbar">
         {recentTrades.length === 0 ? (
             <p className="text-center text-gray-500 mt-4">No recent trades found.</p>
@@ -477,6 +495,7 @@ export default function DEXApp() {
                     <span className="w-1/4 text-right text-gray-300">
                         {trade.amount.toFixed(2)}
                     </span>
+                    {/* FIX: Changed closing </div> to </span> and added a closing </div> for the trade item. */}
                     <span className="w-1/4 text-right text-gray-500 text-xs self-center hidden sm:block">
                         {new Date(trade.time).toLocaleTimeString()}
                     </span>
@@ -516,7 +535,6 @@ export default function DEXApp() {
   // Main Trade Dashboard
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
-      {/* Global styles (background, font, scrollbar) are now handled by app/globals.css */}
       
       <Header />
       <MobileMenu />
