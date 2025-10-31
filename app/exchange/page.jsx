@@ -1,4 +1,4 @@
-"use client"; // <--- FIX: This directive marks the component as a Client Component
+"use client"; // This remains critical for using React hooks like useState and useMemo
 
 import React, { useState, useMemo } from 'react';
 import {
@@ -7,9 +7,9 @@ import {
 } from 'lucide-react';
 
 // --- Configuration Constants ---
-// NOTE: Colors are now defined as explicit strings to avoid React warnings.
+// NOTE: These constants are now correctly referenced throughout the component.
 const PRIMARY_ACCENT_TEXT = 'text-amber-500';
-const PRIMARY_ACCENT_BG = 'bg-amber-500';
+const PRIMARY_ACCENT_BG = 'bg-amber-500'; // Correctly defined as PRIMARY_ACCENT_BG
 const PRIMARY_ACTIVE_BG_CLASS = 'bg-amber-600';
 const PRIMARY_HOVER_BG_CLASS = 'hover:bg-amber-600';
 const PRIMARY_BORDER_CLASS = 'border-amber-500';
@@ -309,7 +309,7 @@ const TradeForm = ({ currentPair }) => {
                         onClick={() => setTradeType(type)}
                         className={`py-1 px-3 rounded-full transition duration-150 ${
                             tradeType === type
-                                ? `${PRIMARY_BG_CLASS} text-gray-900 font-semibold`
+                                ? `${PRIMARY_ACCENT_BG} text-gray-900 font-semibold`
                                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                         }`}
                     >
@@ -486,7 +486,7 @@ const App = () => {
     // --- Main Trading Interface ---
     return (
         <div className="min-h-screen bg-gray-950 font-sans flex antialiased text-gray-100">
-            {/* This <style> block is necessary for Tailwind's Just-in-Time (JIT) compiler 
+            {/* This <style> block is necessary for Tailwind's JIT compiler 
               to recognize the dynamically constructed class names.
             */}
             <style jsx global>{`
@@ -577,4 +577,3 @@ const App = () => {
 };
 
 export default App;
-
