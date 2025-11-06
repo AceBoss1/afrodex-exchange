@@ -1,22 +1,13 @@
-import type { Config } from 'tailwindcss';
-
-const config: Config = {
-  // CRITICAL: This content array tells Tailwind where to find the class names.
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+// tailwind.config.js
+module.exports = {
+  content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}', './pages/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        // Define your custom accent colors here for easy use
-        'afro-primary': '#f59e0b', // A reference for the amber-500 we are using
-        'afro-dark': '#0f172a',    // Deep slate blue for background
+        orange: '#ff8c2b',
+        dark: '#0b0b0f',
+        panel: '#141419'
       },
     },
   },
-  plugins: [],
-};
-
-export default config;
+}
