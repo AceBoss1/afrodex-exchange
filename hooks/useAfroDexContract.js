@@ -1,24 +1,26 @@
-// hooks/useAfroDexContract.js
-import { useMemo } from 'react'
-import { useProvider, useSigner } from 'wagmi'
-import { Contract } from 'ethers'
-import ABI from '../lib/abi.json'
+import { useMemo } from "react";
+import { useWalletClient, usePublicClient } from "wagmi";
+import ABI from "../lib/abi.json";
 
 export default function useAfroDexContract() {
-  const provider = useProvider()
-  const { data: signer } = useSigner()
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
 
-  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
+  const address =
+    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+    "0xE8FfF15bB5E14095bFdfA8Bb85D83cC900c23C56";
 
-  const readContract = useMemo(() => {
-    if (!provider || !contractAddress) return null
-    return new Contract(contractAddress, ABI, provider)
-  }, [provider])
+  const read = useMemo(() => ({
+    address,
+    abi: ABI,
+    publicClient,
+  }), [publicClient]);
 
-  const writeContract = useMemo(() => {
-    if (!signer || !contractAddress) return null
-    return new Contract(contractAddress, ABI, signer)
-  }, [signer])
+  const write = useMemo(() => ({
+    address,
+    abi: ABI,
+    walletClient,
+  }), [walletClient]);
 
-  return { readContract, writeContract }
+  return { read, write, address };
 }
