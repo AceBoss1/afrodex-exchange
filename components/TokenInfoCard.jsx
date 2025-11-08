@@ -1,6 +1,57 @@
 import Image from 'next/image'
 import React from 'react'
 
+const TOKEN_DETAILS = {
+  AfroX: {
+    name: 'AfroDex',
+    logo: '/tokens/afrox.png',
+    description:
+      'AfroDex serves as a blockchain tech community focused on developing and deploying free or affordable technologies for easier Ethereum and ERC-20 tokens mass adoption.',
+    etherscan: 'https://etherscan.io/token/0x08130635368AA28b217a4dfb68E1bF8dC525621C',
+    tracker: 'https://coinmarketcap.com/currencies/afrodex/',
+  },
+  AFDLT: {
+    name: 'AfroDex Labs Token',
+    logo: '/tokens/afdlts.png', // ✅ corrected filename
+    description:
+      'AFDLT powers research, innovation, and decentralized governance across the AfroDex Labs ecosystem.',
+    etherscan: 'https://etherscan.io/token/0xD8a8843b0a5aba6B030E92B3F4d669FaD8A5BE50',
+    tracker: 'https://coinmarketcap.com/currencies/afrodex-labs-token/',
+  },
+  PFARM: {
+    name: 'PFARM',
+    logo: '/tokens/pfarm.png',
+    description:
+      'PFARM is a utility token supporting decentralized agricultural finance and yield optimization.',
+    etherscan: 'https://etherscan.io/token/0x6a8C66Cab4F766E5E30b4e9445582094303cc322',
+    tracker: 'https://coinmarketcap.com/currencies/farm-defi/',
+  },
+  FREE: {
+    name: 'FREE Coin',
+    logo: '/tokens/free.png',
+    description:
+      'FREE Coin is one of the largest distributed ERC-20 tokens, designed to fuel global crypto adoption.',
+    etherscan: 'https://etherscan.io/token/0x2F141Ce366a2462f02cEA3D12CF93E4DCa49e4Fd',
+    tracker: 'https://coinmarketcap.com/currencies/free-coin/',
+  },
+  PLAAS: {
+    name: 'PLAAS Farmers Token',
+    logo: '/tokens/plaas.png',
+    description:
+      'PLAAS enables farmers to integrate blockchain for livestock management, logistics, and data analytics.',
+    etherscan: 'https://etherscan.io/token/0x60571E95E12c78CbA5223042692908f0649435a5',
+    tracker: 'https://coinmarketcap.com/currencies/plaas-farmers-token/',
+  },
+  BCT: {
+    name: 'Bitcratic Token',
+    logo: '/tokens/bct.png',
+    description:
+      'BCT empowers decentralized exchange governance and liquidity participation.',
+    etherscan: 'https://etherscan.io/token/0x9eC251401eAfB7e98f37A1D911c0AEA02CB63A80',
+    tracker: 'https://coinmarketcap.com/currencies/bitcratic/',
+  },
+}
+
 export default function TokenInfoCard({ token }) {
   if (!token) return null
 
@@ -41,57 +92,4 @@ export default function TokenInfoCard({ token }) {
       </div>
     </div>
   )
-}
-
-
-// ✅ Token Meta Registry (Extend Anytime)
-const TOKEN_DETAILS = {
-  AfroX: {
-    name: 'AfroDex',
-    logo: '/tokens/afrox.png',
-    description:
-      'AfroDex serves as a blockchain tech community focused on developing and deploying free or affordable technologies for easier Ethereum and ERC-20 tokens mass adoption.',
-    etherscan: 'https://etherscan.io/token/0x08130635368AA28b217a4dfb68E1bF8dC525621C',
-    tracker: 'https://coinmarketcap.com/currencies/afrodex/',
-  },
-  AFDLT: {
-    name: 'AfroDex Labs Token',
-    logo: '/tokens/afdlttoken.png',
-    description:
-      'AFDLT powers research, innovation, and decentralized governance across the AfroDex Labs ecosystem.',
-    etherscan: 'https://etherscan.io/token/0xD8a8843b0a5aba6B030E92B3F4d669FaD8A5BE50',
-    tracker: 'https://coinmarketcap.com/currencies/afrodex-labs-token/',
-  },
-  PFARM: {
-    name: 'PFARM',
-    logo: '/tokens/pfarm.png',
-    description:
-      'PFARM is a utility token supporting decentralized agricultural finance and yield optimization.',
-    etherscan: 'https://etherscan.io/token/0x6a8C66Cab4F766E5E30b4e9445582094303cc322',
-    tracker: 'https://coinmarketcap.com/currencies/farm-defi/',
-  },
-  FREE: {
-    name: 'FREE Coin',
-    logo: '/tokens/free.png',
-    description:
-      'FREE Coin is one of the largest distributed ERC-20 tokens, designed to fuel global crypto adoption.',
-    etherscan: 'https://etherscan.io/token/0x2F141Ce366a2462f02cEA3D12CF93E4DCa49e4Fd',
-    tracker: 'https://coinmarketcap.com/currencies/free-coin/',
-  },
-  PLAAS: {
-    name: 'PLAAS Farmers Token',
-    logo: '/tokens/plaas.png',
-    description:
-      'PLAAS enables farmers to integrate blockchain for livestock management, logistics, and data analytics.',
-    etherscan: 'https://etherscan.io/token/0x60571E95E12c78CbA5223042692908f0649435a5',
-    tracker: 'https://coinmarketcap.com/currencies/plaas-farmers-token',
-  },
-  BCT: {
-    name: 'Bitcratic Token',
-    logo: '/tokens/bct.png',
-    description:
-      'BCT empowers decentralized exchange governance and liquidity participation.',
-    etherscan: 'https://etherscan.io/token/0x9eC251401eAfB7e98f37A1D911c0AEA02CB63A80',
-    tracker: 'https://coinmarketcap.com/currencies/bitcratic',
-  },
 }
