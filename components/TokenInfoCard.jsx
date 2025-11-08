@@ -58,11 +58,35 @@ T1C: {
     etherscan: 'https://etherscan.io/token/0xa7C71d444bf9aF4bfEd2adE75595d7512Eb4DD39',
     tracker: 'https://coinmarketcap.com/currencies/travel1click/',
   },
+USDT: {
+    name: 'Tether USD',
+    logo: '/tokens/USDT.png', // ✅ corrected filename
+    description:
+      'Tether works to disrupt the conventional financial system via a more modern approach to money.',
+    etherscan: 'https://etherscan.io/token/0xdac17f958d2ee523a2206206994597c13d831ec7',
+    tracker: 'https://coinmarketcap.com/currencies/tether/',
+  },
+BUSD: {
+    name: 'Binance USD',
+    logo: '/tokens/BUSD.png', // ✅ corrected filename
+    description:
+      'Binance USD (BUSD) is a dollar-backed stablecoin issued and custodied by Paxos Trust Company',
+    etherscan: 'https://etherscan.io/token/0x4fabb145d64652a948d72533023f6e7a623c7c53',
+    tracker: 'https://coinmarketcap.com/currencies/binance-usd/',
+  },
+DAI: {
+    name: 'Dai Stablecoin',
+    logo: '/tokens/DAI.png', // ✅ corrected filename
+    description:
+      'DAI is a stablecoin whose issuance and development is managed by the Maker Protocol and MakerDAO',
+    etherscan: 'https://etherscan.io/token/0x6b175474e89094c44da98b954eedeac495271d0f',
+    tracker: 'https://coinmarketcap.com/currencies/multi-collateral-dai/',
+  },
 BCT: {
     name: 'Bitcratic Token',
     logo: '/tokens/bct.png',
     description:
-      'BCT empowers decentralized exchange governance and liquidity participation.',
+      'BCT empowers decentralized exchange governance and liquidity participation on Bitcratic.',
     etherscan: 'https://etherscan.io/token/0x9eC251401eAfB7e98f37A1D911c0AEA02CB63A80',
     tracker: 'https://coinmarketcap.com/currencies/bitcratic/',
   },
