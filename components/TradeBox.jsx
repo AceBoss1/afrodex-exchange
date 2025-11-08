@@ -1,51 +1,37 @@
 // components/TradeBox.jsx
 import { useState } from 'react'
-import useOrderFunctions from '../hooks/useOrderFunctions'
 
 export default function TradeBox({ market }) {
-  const [price, setPrice] = useState(market.price)
   const [amount, setAmount] = useState('')
-  const [side, setSide] = useState('Sell')
-  const { order, trade } = useOrderFunctions()
-
-  const place = async () => {
-    // For this DLOB, order() signature expects (tokenGet, amountGet, tokenGive, amountGive, expires, nonce)
-    // We'll use placeholder expires / nonce here for demo. In production compute properly.
-    const tokenGet = market.quote === 'ETH' ? '0x0000000000000000000000000000000000000000' : ''
-    const tokenGive = market.base === 'AfroX' ? '0x08130635368AA28b217a4dfb68E1bF8dC525621C' : ''
-    // amounts as strings; contract functions will parse
-    await order(tokenGet, price, tokenGive, amount, Math.floor(Date.now()/1000) + 3600, Math.floor(Math.random() * 1000000))
-  }
+  const [side, setSide] = useState('Buy')
 
   return (
-    <div className="bg-[#141419] rounded-2xl p-4 flex flex-col justify-between h-full">
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h4 className="text-orange font-semibold">Place Order</h4>
-          <div className="flex gap-1 text-xs">
-            <button onClick={()=>setSide('Buy')} className={`px-3 py-1 rounded-md ${side==='Buy'? 'bg-white/5':''}`}>Buy</button>
-            <button onClick={()=>setSide('Sell')} className={`px-3 py-1 rounded-md ${side==='Sell'? 'bg-orange text-black font-bold':''}`}>Sell</button>
-          </div>
-        </div>
+    <div className="bg-[#141419] rounded-2xl p-4">
+      <h4 className="text-orange-400 font-semibold mb-3">
+        {side} {market.base}
+      </h4>
 
-        <div className="space-y-2">
-          <div><label className="text-xs text-gray-400">Price (ETH)</label>
-            <input value={price} onChange={e=>setPrice(e.target.value)} className="w-full mt-1 p-2 bg-[#0f1114] rounded-md border border-white/6 text-white" />
-          </div>
+      <div className="flex flex-col gap-2">
+        <input
+          type="number"
+          placeholder="Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="bg-[#0b0b0f] rounded-lg p-2 w-full text-white outline-none"
+        />
+        <button
+          onClick={() => alert(`${side} ${amount} ${market.base}/${market.quote}`)}
+          className={`rounded-lg py-2 font-semibold ${side === 'Buy' ? 'bg-green-600' : 'bg-red-600'}`}
+        >
+          {side}
+        </button>
 
-          <div><label className="text-xs text-gray-400">Amount (Base)</label>
-            <input value={amount} onChange={e=>setAmount(e.target.value)} className="w-full mt-1 p-2 bg-[#0f1114] rounded-md border border-white/6 text-white" />
-          </div>
-
-          <div className="flex items-center justify-between text-xs text-gray-400">
-            <div>Total (Quote)</div>
-            <div>Available: 12.345 ETH</div>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <button onClick={place} className="w-full mt-3 py-2 rounded-lg bg-orange text-black font-bold">Place Order</button>
+        <button
+          onClick={() => setSide(side === 'Buy' ? 'Sell' : 'Buy')}
+          className="text-gray-300 text-sm underline mt-1"
+        >
+          Switch to {side === 'Buy' ? 'Sell' : 'Buy'}
+        </button>
       </div>
     </div>
   )
