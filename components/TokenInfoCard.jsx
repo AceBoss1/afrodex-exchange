@@ -42,7 +42,23 @@ const TOKEN_DETAILS = {
     etherscan: 'https://etherscan.io/token/0x60571E95E12c78CbA5223042692908f0649435a5',
     tracker: 'https://coinmarketcap.com/currencies/plaas-farmers-token/',
   },
-  BCT: {
+  LWBT: {
+    name: 'Living Without Borders Token',
+    logo: '/tokens/lwb.png', // ✅ corrected filename
+    description:
+      'LWBT powers lifcestyle on the Living Without Borders International ecosystem.',
+    etherscan: 'https://etherscan.io/token/0xA03c34eE9fA0e8db36Dd9bF8D46631Bb25F66302',
+    tracker: 'https://LWBinternational.org/',
+  },
+T1C: {
+    name: 'Travel1Click',
+    logo: '/tokens/t1c.png', // ✅ corrected filename
+    description:
+      'T1C powers research, innovation, and decentralized travel ecosystem.',
+    etherscan: 'https://etherscan.io/token/0xa7C71d444bf9aF4bfEd2adE75595d7512Eb4DD39',
+    tracker: 'https://coinmarketcap.com/currencies/travel1click/',
+  },
+BCT: {
     name: 'Bitcratic Token',
     logo: '/tokens/bct.png',
     description:
