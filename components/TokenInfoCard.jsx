@@ -1,4 +1,4 @@
-// components/TokenInfoCard.jsx
+import Image from 'next/image'
 import React from 'react'
 
 export default function TokenInfoCard({ token }) {
@@ -14,28 +14,28 @@ export default function TokenInfoCard({ token }) {
 
   return (
     <div className="bg-[#141419] rounded-xl p-4 mt-3 text-sm">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-orange-400 text-lg">🟠</span>
+      <div className="flex items-center gap-3 mb-3">
+        <Image
+          src={tokenInfo.logo}
+          width={36}
+          height={36}
+          alt={tokenInfo.name}
+          className="rounded-full"
+        />
         <div>
-          <h4 className="font-semibold text-white">{tokenInfo.name} <span className="text-gray-400 text-sm">({token.symbol})</span></h4>
+          <h4 className="font-semibold text-white">
+            {tokenInfo.name} <span className="text-gray-400 text-sm">({token.symbol})</span>
+          </h4>
         </div>
       </div>
-      <p className="text-gray-400 mb-3">{tokenInfo.description}</p>
-      <div className="flex gap-4 text-orange-400 text-xs">
-        <a
-          href={tokenInfo.etherscan}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline"
-        >
+
+      <p className="text-gray-400 mb-3 leading-relaxed">{tokenInfo.description}</p>
+
+      <div className="flex gap-4 text-orange-400 text-xs font-medium">
+        <a href={tokenInfo.etherscan} target="_blank" rel="noopener noreferrer" className="hover:underline">
           EtherScan &gt;
         </a>
-        <a
-          href={tokenInfo.tracker}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline"
-        >
+        <a href={tokenInfo.tracker} target="_blank" rel="noopener noreferrer" className="hover:underline">
           Track Trades &gt;
         </a>
       </div>
@@ -43,54 +43,55 @@ export default function TokenInfoCard({ token }) {
   )
 }
 
-// Token details map
+
+// ✅ Token Meta Registry (Extend Anytime)
 const TOKEN_DETAILS = {
   AfroX: {
     name: 'AfroDex',
+    logo: '/tokens/afrox.png',
     description:
       'AfroDex serves as a blockchain tech community focused on developing and deploying free or affordable technologies for easier Ethereum and ERC-20 tokens mass adoption.',
-    etherscan:
-      'https://etherscan.io/token/0x08130635368AA28b217a4dfb68E1bF8dC525621C',
-    tracker: 'https://coincodex.com/crypto/afrodex/',
+    etherscan: 'https://etherscan.io/token/0x08130635368AA28b217a4dfb68E1bF8dC525621C',
+    tracker: 'https://coinmarketcap.com/currencies/afrodex/',
   },
   AFDLT: {
     name: 'AfroDex Labs Token',
+    logo: '/tokens/afdlttoken.png',
     description:
-      'AfroDex Labs Token (AFDLT) powers research, development, and governance for AfroDex Labs blockchain initiatives.',
-    etherscan:
-      'https://etherscan.io/token/0xD8a8843b0a5aba6B030E92B3F4d669FaD8A5BE50',
-    tracker: 'https://coincodex.com/crypto/afrodex-labs-token/',
+      'AFDLT powers research, innovation, and decentralized governance across the AfroDex Labs ecosystem.',
+    etherscan: 'https://etherscan.io/token/0xD8a8843b0a5aba6B030E92B3F4d669FaD8A5BE50',
+    tracker: 'https://coinmarketcap.com/currencies/afrodex-labs-token/',
   },
   PFARM: {
-    name: 'FARM DeFi',
+    name: 'PFARM',
+    logo: '/tokens/pfarm.png',
     description:
-      'FARM DeFi (PFARM) supports decentralized agricultural finance and sustainable farming incentives.',
-    etherscan:
-      'https://etherscan.io/token/0x6a8C66Cab4F766E5E30b4e9445582094303cc322',
-    tracker: 'https://coingecko.com/en/coins/pfarm',
-  },
-  PLAAS: {
-    name: 'PLAAS FARMERS TOKEN',
-    description:
-      'PLAAS connects farmers through blockchain to digital markets, logistics, and data analytics.',
-    etherscan:
-      'https://etherscan.io/token/0x60571E95E12c78CbA5223042692908f0649435a5',
-    tracker: 'https://coingecko.com/en/coins/plaas-farmers-token',
+      'PFARM is a utility token supporting decentralized agricultural finance and yield optimization.',
+    etherscan: 'https://etherscan.io/token/0x6a8C66Cab4F766E5E30b4e9445582094303cc322',
+    tracker: 'https://coinmarketcap.com/currencies/farm-defi/',
   },
   FREE: {
-    name: 'Free Coin',
+    name: 'FREE Coin',
+    logo: '/tokens/free.png',
     description:
-      'FREE Coin is one of the most distributed ERC-20 tokens, designed to encourage crypto mass adoption through availability and utility.',
-    etherscan:
-      'https://etherscan.io/token/0x2F141Ce366a2462f02cEA3D12CF93E4DCa49e4Fd',
-    tracker: 'https://coincodex.com/crypto/free-coin/',
+      'FREE Coin is one of the largest distributed ERC-20 tokens, designed to fuel global crypto adoption.',
+    etherscan: 'https://etherscan.io/token/0x2F141Ce366a2462f02cEA3D12CF93E4DCa49e4Fd',
+    tracker: 'https://coinmarketcap.com/currencies/free-coin/',
+  },
+  PLAAS: {
+    name: 'PLAAS Farmers Token',
+    logo: '/tokens/plaas.png',
+    description:
+      'PLAAS enables farmers to integrate blockchain for livestock management, logistics, and data analytics.',
+    etherscan: 'https://etherscan.io/token/0x60571E95E12c78CbA5223042692908f0649435a5',
+    tracker: 'https://coinmarketcap.com/currencies/plaas-farmers-token',
   },
   BCT: {
     name: 'Bitcratic Token',
+    logo: '/tokens/bct.png',
     description:
-      'Bitcratic Token represents the first decentralized exchange governance model on Ethereum.',
-    etherscan:
-      'https://etherscan.io/token/0x9eC251401eAfB7e98f37A1D911c0AEA02CB63A80',
-    tracker: 'https://coingecko.com/en/coins/bitcratic',
+      'BCT empowers decentralized exchange governance and liquidity participation.',
+    etherscan: 'https://etherscan.io/token/0x9eC251401eAfB7e98f37A1D911c0AEA02CB63A80',
+    tracker: 'https://coinmarketcap.com/currencies/bitcratic',
   },
 }
