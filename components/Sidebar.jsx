@@ -1,85 +1,70 @@
-// components/Sidebar.jsx
-import { useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { useAccount, useConnect, useDisconnect } from "wagmi"
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
-
   const { isConnected, address } = useAccount()
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
 
-  const short = (addr) => addr?.slice(0, 6) + '...' + addr?.slice(-4)
+  const short = (addr) => addr?.slice(0, 6) + "..." + addr?.slice(-4)
 
   return (
     <aside className={`bg-[#141419] text-white rounded-2xl flex flex-col justify-between transition-all duration-300 p-4 ${collapsed ? 'w-20' : 'w-64'}`}>
       
-      {/* Top */}
+      {/* Logo + Collapse */}
       <div>
-        {/* Logo + Collapse Toggle */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <Image src="/afrodex_logo.jpg" width={36} height={36} alt="AfroDex" className="rounded-md" />
+            <Image src="/afrodex_logo.jpg" alt="AfroDex" width={36} height={36} className="rounded-full" />
             {!collapsed && (
               <div>
                 <h1 className="text-lg font-semibold">AfroDex</h1>
-                <p className="text-[10px] italic text-orange-400">Africa's Biggest DEX</p>
+                <p className="text-[10px] italic text-gray-400">Africa&apos;s Biggest Dex</p>
               </div>
             )}
           </div>
-          <button onClick={() => setCollapsed(!collapsed)} className="text-gray-400 hover:text-orange-400">
-            {collapsed ? '⮞' : '⮜'}
+          <button onClick={() => setCollapsed(!collapsed)} className="text-gray-400 hover:text-orange-400 text-lg">
+            {collapsed ? "⮞" : "⮜"}
           </button>
         </div>
 
         {/* Navigation */}
         <nav className="flex flex-col gap-3 text-sm">
-          <Link href="/" className="hover:text-orange-400 flex items-center gap-2">
-            🏦 {!collapsed && 'DEX'}
-          </Link>
-          <a href="https://afrodex-staking.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 flex items-center gap-2">
-            💎 {!collapsed && 'Stake'}
-          </a>
-          <span className="opacity-40 cursor-not-allowed flex items-center gap-2">
-            🔄 {!collapsed && 'Swap (Coming Soon)'}
-          </span>
-          <Link href="#" className="hover:text-orange-400 flex items-center gap-2">
-            📚 {!collapsed && 'Trading Guide'}
-          </Link>
-          <Link href="#" className="hover:text-orange-400 flex items-center gap-2">
-            ⚙️ {!collapsed && 'Settings'}
-          </Link>
+          <Link href="/" className="hover:text-orange-400">🟠 {collapsed ? '' : 'Dex'}</Link>
+          <a href="https://afrodex-staking.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400">💎 {collapsed ? '' : 'Stake'}</a>
+          <span className="opacity-40 cursor-not-allowed">🔄 {collapsed ? '' : 'Swap (Coming Soon)'}</span>
+          <Link href="/guide" className="hover:text-orange-400">📘 {collapsed ? '' : 'Trading Guide'}</Link>
+          <Link href="/settings" className="hover:text-orange-400">⚙️ {collapsed ? '' : 'Settings'}</Link>
         </nav>
       </div>
 
-      {/* Connect Wallet Section */}
+      {/* Wallet Button */}
       <div className="mt-6">
         {!isConnected ? (
           <button
-            onClick={() => connect({ connector: connectors[0] })} // WalletConnect QR Default
-            className="bg-black border border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-black transition-all rounded-lg py-2 px-3 w-full font-semibold flex items-center justify-center gap-2"
+            onClick={() => connect({ connector: connectors[1] })}
+            className="bg-black border border-orange-500 text-[#F97316] rounded-lg py-2 px-3 w-full font-semibold flex items-center justify-center gap-2"
           >
-            🔐 {collapsed ? '' : 'Connect Wallet'}
+            🔐 Connect Wallet
           </button>
         ) : (
           <button
-            onClick={() => disconnect()}
+            onClick={disconnect}
             className="bg-black border border-orange-500 text-orange-400 rounded-lg py-2 px-3 w-full font-semibold"
           >
-            {collapsed ? '⛔' : `${short(address)} • Disconnect`}
+            {short(address)} • Disconnect
           </button>
         )}
       </div>
 
       {/* Footer */}
-      {!collapsed && (
-        <footer className="text-[11px] mt-4 text-center text-gray-500">
-          © 2019-Present <span className="text-orange-400 font-semibold">AFRODEX</span><br/>
-          ❤️ 0xC54f68D1eD99e0B51C162F9a058C2a0A88D2ce2A
-        </footer>
-      )}
+      <footer className="pt-4 text-center text-[10px] text-gray-400 border-t border-white/5">
+        © 2019-Present <span className="text-orange-400">AFRODEX</span><br/>
+        ❤️ Donations: 0xC54f68D1eD99e0B51C162F9a058C2a0A88D2ce2A
+      </footer>
     </aside>
   )
 }
