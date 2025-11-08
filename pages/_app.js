@@ -1,37 +1,34 @@
 // pages/_app.js
-import '../styles/globals.css'
-import { WagmiConfig, createConfig, configureChains } from 'wagmi'
-import { mainnet } from 'viem/chains'
-import { alchemyProvider } from 'wagmi/providers/alchemy'
-import { publicProvider } from 'wagmi/providers/public'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
-import { publicClient } from 'viem'
-import Layout from '../components/Sidebar'
+import '@/styles/globals.css'
+import { WagmiProvider, createConfig, http } from 'wagmi'
+import { mainnet } from 'wagmi/chains'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { walletConnect } from 'wagmi/connectors'
 
-const ALCHEMY = process.env.NEXT_PUBLIC_ALCHEMY_KEY
-const WC_PROJECT = process.env.NEXT_PUBLIC_WC_PROJECT_ID
+// setup React Query client for wagmi
+const queryClient = new QueryClient()
 
-const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet],
-  [alchemyProvider({ apiKey: ALCHEMY }), publicProvider()]
-)
-
+// define wagmi config
 const config = createConfig({
-  autoConnect: true,
+  chains: [mainnet],
+  transports: {
+    [mainnet.id]: http(`https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_KEY}`),
+  },
   connectors: [
-    new (await import('wagmi/connectors/injected')).InjectedConnector({ chains }),
-    new WalletConnectConnector({ chains, options: { projectId: WC_PROJECT } })
+    walletConnect({
+      projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
+      showQrModal: true,
+    }),
   ],
-  publicClient: provider,
-  webSocketPublicClient: webSocketProvider,
 })
 
+// wrap app
 export default function App({ Component, pageProps }) {
   return (
-    <WagmiConfig config={config}>
-      <Layout>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
         <Component {...pageProps} />
-      </Layout>
-    </WagmiConfig>
+      </QueryClientProvider>
+    </WagmiProvider>
   )
 }
