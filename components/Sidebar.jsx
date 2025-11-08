@@ -23,7 +23,14 @@ export default function Sidebar() {
               height={36}
               className="rounded-full"
             />
-            {!collapsed && <h1 className="text-lg font-semibold">AfroDex</h1>}
+            {!collapsed && (
+              <div>
+                <h1 className="text-lg font-semibold leading-tight">AfroDex</h1>
+                <p className="text-xs italic font-semibold text-gray-400">
+                  Africa&apos;s Biggest DEX
+                </p>
+              </div>
+            )}
           </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -70,8 +77,8 @@ export default function Sidebar() {
           {/* Connect Wallet (inside settings toggle) */}
           {settingsOpen && !collapsed && (
             <div className="mt-2 pl-5">
-              <button className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg py-2 px-3 w-full font-semibold">
-                Connect Wallet
+              <button className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg py-2 px-3 w-full font-semibold flex items-center justify-center gap-2">
+                🔐 Connect Wallet
               </button>
             </div>
           )}
