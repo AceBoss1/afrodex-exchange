@@ -1,5 +1,5 @@
 import { useContractWrite, usePrepareContractWrite } from 'wagmi';
-import AfroDexABI from '@/lib/abi/AfroDexABI.json';
+import AfroDexABI from '../lib/abi/AfroDexABI.json';
 
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
