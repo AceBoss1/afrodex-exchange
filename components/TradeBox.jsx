@@ -13,24 +13,30 @@ export default function TradeBox({ market }) {
 
   return (
     <div className="bg-[#141419] rounded-2xl p-4 flex flex-col h-full text-gray-200 space-y-6">
-      
+
       {/* Header + Buy/Sell Toggle */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-orange-400 font-semibold">Place Order</h4>
+          <h4 className="text-[var(--orange)] font-semibold">Place Order</h4>
+
           <div className="flex gap-2 text-sm">
             <button
               onClick={() => setSide("Buy")}
-              className={`px-3 py-1 rounded-md transition ${
-                side==="Buy" ? "bg-orange-500 text-black" : "bg-white/10 hover:bg-white/20"
+              className={`px-4 py-1.5 rounded-md transition font-semibold ${
+                side === "Buy"
+                  ? "bg-[var(--orange)] text-black"
+                  : "bg-transparent text-[var(--orange)] border border-[var(--orange)] hover:bg-[var(--orange)] hover:text-black"
               }`}
             >
               Buy
             </button>
+
             <button
               onClick={() => setSide("Sell")}
-              className={`px-3 py-1 rounded-md transition ${
-                side==="Sell" ? "bg-orange-500 text-black" : "bg-white/10 hover:bg-white/20"
+              className={`px-4 py-1.5 rounded-md transition font-semibold ${
+                side === "Sell"
+                  ? "bg-[var(--orange)] text-black"
+                  : "bg-transparent text-[var(--orange)] border border-[var(--orange)] hover:bg-[var(--orange)] hover:text-black"
               }`}
             >
               Sell
@@ -61,7 +67,7 @@ export default function TradeBox({ market }) {
         {/* Submit */}
         <button
           onClick={placeOrder}
-          className="w-full mt-3 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-black font-semibold"
+          className="w-full mt-3 py-2 rounded-lg bg-[var(--orange)] hover:bg-orange-600 text-black font-semibold"
         >
           {side} {market.base}
         </button>
