@@ -1,66 +1,57 @@
+// pages/_app.js
 import "@/styles/globals.css";
 import { WagmiConfig, createConfig, http } from "wagmi";
 import { mainnet } from "wagmi/chains";
+import { walletConnect, coinbaseWallet, metaMask } from "wagmi/connectors";
+import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
-import { walletConnect } from "wagmi/connectors";
-import { createWeb3Modal } from "@web3modal/wagmi/react";
-import { useEffect, useState } from "react";
 
-// ✅ Initialize Supabase
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
+const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// ✅ Initialize React Query
-const queryClient = new QueryClient();
+if (!projectId) throw new Error("❌ WalletConnect Project ID missing!");
 
-// ✅ Create Wagmi Config
-const wagmiConfig = createConfig({
+/** ✅ Create Wagmi Config */
+const config = createConfig({
   chains: [mainnet],
   transports: {
-    [mainnet.id]: http(process.env.NEXT_PUBLIC_RPC_URL),
+    [mainnet.id]: http(
+      process.env.NEXT_PUBLIC_RPC_URL ||
+        `https://eth-mainnet.g.alchemy.com/v2/${alchemyKey}`
+    ),
   },
   connectors: [
-    walletConnect({
-      projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
-      showQrModal: false, // Web3Modal will handle the modal
-      metadata: {
-        name: "AfroDex Exchange",
-        description: "Africa’s Biggest DEX",
-        url: process.env.NEXT_PUBLIC_API_URL,
-        icons: ["https://afrodex-exchange.vercel.app/afrodex_logo.jpg"],
-      },
-    }),
+    walletConnect({ projectId }),
+    metaMask(),
+    coinbaseWallet({ appName: "AfroDex Exchange" }),
   ],
   ssr: true,
 });
 
-// ✅ Initialize Web3Modal with Wagmi config
+/** ✅ Initialize Web3Modal */
 createWeb3Modal({
-  wagmiConfig,
-  projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
+  wagmiConfig: config,
+  projectId,
+  enableAnalytics: false,
   themeVariables: {
     "--w3m-accent": "#f97316",
-    "--w3m-background": "#0b0b0f",
+    "--w3m-background-color": "#141419",
   },
 });
 
-// ✅ Main App Component
+/** ✅ Initialize Supabase */
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const queryClient = new QueryClient();
+
 export default function App({ Component, pageProps }) {
-  const [client] = useState(() => queryClient);
-
-  // optional log for debugging
-  useEffect(() => {
-    console.log("WalletConnect Project ID:", process.env.NEXT_PUBLIC_WC_PROJECT_ID);
-  }, []);
-
   return (
-    <QueryClientProvider client={client}>
-      <WagmiConfig config={wagmiConfig}>
+    <WagmiConfig config={config}>
+      <QueryClientProvider client={queryClient}>
         <Component {...pageProps} supabase={supabase} />
-      </WagmiConfig>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </WagmiConfig>
   );
 }
