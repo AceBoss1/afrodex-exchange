@@ -1,96 +1,80 @@
-// components/PlaceOrder.jsx
-import { useState } from "react";
+"use client";
+import React, { useState } from "react";
 
 export default function PlaceOrder({ market }) {
   const [side, setSide] = useState("Buy");
-  const [amount, setAmount] = useState("");
   const [price, setPrice] = useState("");
-  const [expires, setExpires] = useState(10000);
+  const [amount, setAmount] = useState("");
 
-  const total = amount && price ? (amount * price).toFixed(6) : "0.000000";
-
-  const handleSubmit = () => {
-    console.log(`${side} order placed`, { amount, price, total, expires });
+  const handleOrder = () => {
+    alert(`${side} order placed for ${amount} ${market.base} @ ${price} ${market.quote}`);
   };
 
   return (
-    <div className="bg-[#141419] rounded-2xl p-4 flex flex-col gap-4">
-      <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-orange-400 text-lg">Place Order</h3>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setSide("Buy")}
-            className={`px-3 py-1 rounded-md text-sm font-semibold ${
-              side === "Buy"
-                ? "bg-orange-500 text-black"
-                : "bg-black border border-orange-400 text-orange-400"
-            }`}
-          >
-            Buy
-          </button>
-          <button
-            onClick={() => setSide("Sell")}
-            className={`px-3 py-1 rounded-md text-sm font-semibold ${
-              side === "Sell"
-                ? "bg-red-600 text-white"
-                : "bg-black border border-red-400 text-red-400"
-            }`}
-          >
-            Sell
-          </button>
-        </div>
+    <div className="bg-[#141419] rounded-2xl p-5 shadow-lg flex flex-col space-y-4">
+      <h3 className="text-orange-400 font-semibold text-lg">
+        Place Order ({market.base}/{market.quote})
+      </h3>
+
+      {/* BUY / SELL Switch */}
+      <div className="flex gap-2 mb-2">
+        <button
+          onClick={() => setSide("Buy")}
+          className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
+            side === "Buy"
+              ? "bg-orange-500 text-black"
+              : "bg-[#1a1a1a] text-gray-400 hover:text-white"
+          }`}
+        >
+          Buy
+        </button>
+        <button
+          onClick={() => setSide("Sell")}
+          className={`flex-1 py-2 rounded-lg font-semibold border transition-all ${
+            side === "Sell"
+              ? "bg-black text-orange-400 border-orange-500"
+              : "bg-[#1a1a1a] text-gray-400 hover:text-white"
+          }`}
+        >
+          Sell
+        </button>
       </div>
 
-      <div className="text-sm space-y-2">
-        <div className="flex justify-between">
-          <span>{market.base}</span>
+      {/* Inputs */}
+      <div className="flex flex-col space-y-3">
+        <div>
+          <label className="text-sm text-gray-400">Price ({market.quote})</label>
           <input
             type="number"
-            placeholder="Amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="bg-[#0b0b0f] rounded px-2 py-1 w-32 text-right"
-          />
-        </div>
-        <div className="flex justify-between">
-          <span>{market.base}/{market.quote}</span>
-          <input
-            type="number"
-            placeholder="Price"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            className="bg-[#0b0b0f] rounded px-2 py-1 w-32 text-right"
+            placeholder="Enter price"
+            className="w-full bg-[#0f0f13] border border-white/10 rounded-lg p-2 mt-1 focus:outline-none focus:border-orange-400"
           />
         </div>
-        <div className="flex justify-between">
-          <span>{market.quote}</span>
-          <input
-            type="text"
-            readOnly
-            value={total}
-            className="bg-[#0b0b0f] rounded px-2 py-1 w-32 text-right"
-          />
-        </div>
-        <div className="flex justify-between">
-          <span>Expires</span>
+
+        <div>
+          <label className="text-sm text-gray-400">Amount ({market.base})</label>
           <input
             type="number"
-            value={expires}
-            onChange={(e) => setExpires(e.target.value)}
-            className="bg-[#0b0b0f] rounded px-2 py-1 w-32 text-right"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Enter amount"
+            className="w-full bg-[#0f0f13] border border-white/10 rounded-lg p-2 mt-1 focus:outline-none focus:border-orange-400"
           />
         </div>
       </div>
 
+      {/* Submit Button */}
       <button
-        onClick={handleSubmit}
-        className={`w-full py-2 mt-2 rounded-lg font-semibold transition ${
+        onClick={handleOrder}
+        className={`mt-3 w-full rounded-lg py-2 font-semibold ${
           side === "Buy"
-            ? "bg-orange-500 text-black hover:bg-orange-400"
-            : "bg-red-600 text-white hover:bg-red-500"
+            ? "bg-orange-500 text-black hover:bg-orange-600"
+            : "bg-black text-orange-400 border border-orange-500 hover:bg-[#1a1a1a]"
         }`}
       >
-        {side === "Buy" ? `Buy ${market.base}` : `Sell ${market.base}`}
+        {side} {market.base}
       </button>
     </div>
   );
