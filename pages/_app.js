@@ -1,21 +1,22 @@
 import "@/styles/globals.css";
-import { useState } from "react";
 import { WagmiConfig, createConfig, http } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import { walletConnect } from "wagmi/connectors";
+import { createWeb3Modal } from "@web3modal/wagmi/react";
+import { useEffect, useState } from "react";
 
-// ✅ Initialize Supabase Client
+// ✅ Initialize Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-// ✅ Initialize React Query Client
+// ✅ Initialize React Query
 const queryClient = new QueryClient();
 
-// ✅ Create Wagmi Configuration (Ethereum Mainnet)
+// ✅ Create Wagmi Config
 const wagmiConfig = createConfig({
   chains: [mainnet],
   transports: {
@@ -24,7 +25,7 @@ const wagmiConfig = createConfig({
   connectors: [
     walletConnect({
       projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
-      showQrModal: true,
+      showQrModal: false, // Web3Modal will handle the modal
       metadata: {
         name: "AfroDex Exchange",
         description: "Africa’s Biggest DEX",
@@ -33,17 +34,31 @@ const wagmiConfig = createConfig({
       },
     }),
   ],
-  ssr: true, // allows SSR hydration without mismatch
+  ssr: true,
 });
 
-// ✅ App Wrapper
+// ✅ Initialize Web3Modal with Wagmi config
+createWeb3Modal({
+  wagmiConfig,
+  projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
+  themeVariables: {
+    "--w3m-accent": "#f97316",
+    "--w3m-background": "#0b0b0f",
+  },
+});
+
+// ✅ Main App Component
 export default function App({ Component, pageProps }) {
   const [client] = useState(() => queryClient);
+
+  // optional log for debugging
+  useEffect(() => {
+    console.log("WalletConnect Project ID:", process.env.NEXT_PUBLIC_WC_PROJECT_ID);
+  }, []);
 
   return (
     <QueryClientProvider client={client}>
       <WagmiConfig config={wagmiConfig}>
-        {/* ✅ Optionally expose Supabase globally */}
         <Component {...pageProps} supabase={supabase} />
       </WagmiConfig>
     </QueryClientProvider>
