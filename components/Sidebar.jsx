@@ -71,24 +71,25 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Connect Wallet Button */}
-      <div className="mt-6">
-        {!isConnected ? (
-          <button
-            onClick={() => open()}
-            className="bg-black border border-orange-500 text-[#F97316] rounded-lg py-2 px-3 w-full font-semibold flex items-center justify-center gap-2"
-          >
-            🔐 Connect Wallet
-          </button>
-        ) : (
-          <button
-            onClick={() => open()}
-            className="bg-orange-500 hover:bg-orange-600 text-black rounded-lg py-2 px-3 w-full font-semibold"
-          >
-            {short(address)}
-          </button>
-        )}
-      </div>
+    {/* Connect Wallet Button */}
+<div className="mt-6">
+  {!isConnected ? (
+    <button
+      onClick={() => open()} // or connect() if using wagmi connect
+      className="bg-black border border-orange-500 text-[color:#F97316] hover:bg-orange-500 hover:text-black transition-all rounded-lg py-2 px-3 w-full font-semibold flex items-center justify-center gap-2"
+    >
+      🔐 {collapsed ? "" : "Connect Wallet"}
+    </button>
+  ) : (
+    <button
+      onClick={() => open()} // open Web3Modal or open account menu
+      className="bg-[color:#F97316] hover:bg-orange-600 text-black rounded-lg py-2 px-3 w-full font-semibold"
+    >
+      {short(address)}
+    </button>
+  )}
+</div>
+
 
       {/* Footer */}
       <footer className="p-4 text-center text-xs border-t border-gray-700 text-gray-400">
