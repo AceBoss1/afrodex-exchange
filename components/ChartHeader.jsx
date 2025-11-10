@@ -1,24 +1,32 @@
 // components/ChartHeader.jsx
-export default function ChartHeader({ market }) {
-  return (
-    <div className="bg-[#141419] rounded-2xl p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-xl font-bold">{market.base} / {market.quote}</div>
-          <div className="text-xs text-gray-400">Last Price ({market.quote})</div>
-        </div>
-        <div className="text-right">
-          <div className="text-lg font-extrabold text-orange">{market.price}</div>
-          <div className={market.change >= 0 ? 'text-green-400 font-semibold' : 'text-red-400 font-semibold'}>{market.change>0?'+':''}{market.change}%</div>
-        </div>
-      </div>
+"use client"
+import { useEffect, useState } from "react"
+import { fetchMarketStats } from "@/lib/afrodexClient"
 
-      <div className="mt-3 h-48 bg-[#0f1114] rounded-lg border border-white/6 flex items-center justify-center text-gray-500">
-        TradingView Chart Placeholder
+export default function ChartHeader({ market }) {
+  const [stats, setStats] = useState({ volume: 0, lastPrice: 0 })
+
+  useEffect(() => {
+    if (!market) return
+    const load = async () => setStats(await fetchMarketStats(market.base, market.quote))
+    load()
+    const interval = setInterval(load, 15000)
+    return () => clearInterval(interval)
+  }, [market])
+
+  return (
+    <div className="bg-[#141419] rounded-2xl p-4 flex justify-between items-center">
+      <div>
+        <h3 className="text-xl font-semibold">
+          {market.base}/{market.quote}
+        </h3>
+        <div className="text-gray-400 text-sm">AfroDex Main Market</div>
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <div className="bg-[#0f1114] p-3 rounded-lg text-sm text-gray-300">Open Orders: <span className="font-semibold text-white">0</span></div>
-        <div className="bg-[#0f1114] p-3 rounded-lg text-sm text-gray-300">24h Volume: <span className="font-semibold text-white">{Number(market.volume).toLocaleString()}</span></div>
+      <div className="text-right">
+        <div className="text-lg font-bold text-orange-400">
+          {stats.lastPrice.toFixed(6)}
+        </div>
+        <div className="text-gray-400 text-sm">Vol: {stats.volume}</div>
       </div>
     </div>
   )
