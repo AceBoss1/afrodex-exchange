@@ -2,7 +2,8 @@
 
 import '@/styles/globals.css'
 import { ReactNode } from 'react'
-import { WagmiConfig, createConfig, http } from 'wagmi'
+import { WagmiConfig, createConfig } from 'wagmi'
+import { http } from 'viem'
 import { mainnet } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit'
