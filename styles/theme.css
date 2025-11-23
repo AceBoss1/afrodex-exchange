@@ -1,0 +1,218 @@
+/* -----------------------------------------
+   ROOT COLOR SYSTEM (AfroDex Brand)
+-------------------------------------------- */
+:root {
+  --bg-primary: #0e0e11;
+  --bg-secondary: #141419;
+  --bg-card: #1a1a20;
+  --bg-hover: #22222a;
+
+  --text-white: #ffffff;
+  --text-gray: #b5b5b5;
+  --text-light: #d8d8d8;
+
+  --border-gray: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  --neon-orange: #ff7a1a;
+  --neon-orange-soft: #ff9e4c;
+  --neon-orange-glow: rgba(255, 122, 26, 0.4);
+
+  --danger: #ff4e4e;
+  --success: #3dff99;
+  --warning: #ffcc00;
+
+  --radius: 12px;
+  --transition: 0.2s ease-out;
+}
+
+/* -----------------------------------------
+   GLOBAL RESET
+-------------------------------------------- */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-primary);
+  color: var(--text-white);
+  font-family: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* -----------------------------------------
+   UNIVERSAL UTILITY STYLES
+-------------------------------------------- */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-gray);
+  padding: 18px;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.card:hover {
+  border-color: var(--neon-orange-soft);
+}
+
+.title-orange {
+  color: var(--neon-orange);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.btn-primary {
+  background: var(--neon-orange);
+  color: black;
+  font-weight: 600;
+  padding: 10px 15px;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.btn-primary:hover {
+  background: var(--neon-orange-soft);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--neon-orange);
+  color: var(--neon-orange);
+  font-weight: 600;
+  padding: 10px 15px;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.btn-outline:hover {
+  background: var(--neon-orange);
+  color: black;
+}
+
+input,
+select,
+textarea {
+  background: #0b0b0e;
+  border: 1px solid var(--border-strong);
+  color: var(--text-white);
+  padding: 10px;
+  width: 100%;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--neon-orange);
+  box-shadow: 0 0 8px var(--neon-orange-glow);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-hover);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-orange-soft);
+}
+
+/* -----------------------------------------
+   LAYOUT CORE
+-------------------------------------------- */
+.layout {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* -----------------------------------------
+   SIDEBAR FIX (D)
+-------------------------------------------- */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  height: 100vh;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-gray);
+  padding: 20px 12px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+  transition: var(--transition);
+  z-index: 100;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+  min-width: 80px;
+}
+
+.sidebar .icon {
+  color: var(--neon-orange);
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.sidebar-item:hover {
+  background: var(--bg-hover);
+  color: var(--neon-orange);
+}
+
+/* Collapsed sidebar hides text */
+.sidebar.collapsed .item-text {
+  display: none;
+}
+
+/* -----------------------------------------
+   MAIN CONTENT FIX (A/B/C/D)
+-------------------------------------------- */
+.main {
+  margin-left: 240px;
+  padding: 25px;
+  width: calc(100% - 240px);
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg-primary);
+  transition: var(--transition);
+}
+
+.main.collapsed {
+  margin-left: 80px;
+  width: calc(100% - 80px);
+}
+
+/* -----------------------------------------
+   FIX BUTTON + INPUT COLORS (B/C)
+-------------------------------------------- */
+button {
+  cursor: pointer;
+}
+
+/* -----------------------------------------
+   STATUS BADGES
+-------------------------------------------- */
+.badge {
+  background: var(--bg-hover);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--text-light);
+}

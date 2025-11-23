@@ -1,30 +1,43 @@
 // components/TradeHistory.jsx
-export default function TradeHistory({ history }) {
-  return (
-    <div className="bg-[#141419] rounded-2xl p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-orange font-semibold">Trade History</h4>
-        <div className="text-sm text-gray-400">Recent trades</div>
-      </div>
+'use client'
 
-      <div className="overflow-auto max-h-40">
-        <table className="w-full text-sm">
-          <thead className="text-xs text-gray-400">
-            <tr><th className="text-left">Time</th><th className="text-left">Pair</th><th>Side</th><th className="text-right">Price</th><th className="text-right">Amount</th><th className="text-right">Total</th></tr>
-          </thead>
-          <tbody>
-            {history.map((t,i)=>(
-              <tr key={i} className={i%2? 'bg-white/2':'bg-white/3'}>
-                <td className="py-1">{t.time}</td>
-                <td>{t.pair}</td>
-                <td className={`text-center ${t.side==='Buy' ? 'text-green-300' : 'text-red-300'}`}>{t.side}</td>
-                <td className="text-right">{t.price}</td>
-                <td className="text-right">{t.amount}</td>
-                <td className="text-right">{t.total}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+const supabase = createClient(supabaseUrl, supabaseAnon)
+
+export default function TradeHistory({ trades = [] }) {
+  return (
+    <div className="card">
+
+      <div className="grid grid-cols-6 text-xs text-gray-400 mb-1">
+        <span>Time</span>
+        <span>Pair</span>
+        <span>Side</span>
+        <span>Price</span>
+        <span>Amount</span>
+        <span>Total</span>
+      </div>
+      <div className="max-h-48 overflow-y-auto text-sm">
+        {trades.length > 0 ? (
+          trades.map((t, i) => (
+            <div key={i} className="grid grid-cols-6 py-0.5 border-b border-gray-800">
+              <span>{t.time}</span>
+              <span>{t.pair}</span>
+              <span className={t.side === 'Buy' ? 'text-green-400' : 'text-red-400'}>
+                {t.side}
+              </span>
+              <span>{t.price}</span>
+              <span>{t.amount}</span>
+              <span>{t.total}</span>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500 text-sm mt-2">No trades yet</p>
+        )}
       </div>
     </div>
   )

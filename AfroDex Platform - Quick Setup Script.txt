@@ -1,0 +1,157 @@
+#!/bin/bash
+# AfroDex Platform - Quick Setup Script
+# Run these commands in order to set up the project
+
+# ===============================================
+# 1. CREATE DIRECTORY STRUCTURE
+# ===============================================
+mkdir -p app components lib/abi public styles
+
+# ===============================================
+# 2. INSTALL DEPENDENCIES
+# ===============================================
+npm install react react-dom next
+npm install wagmi viem @rainbow-me/rainbowkit @tanstack/react-query
+npm install lucide-react
+npm install -D tailwindcss postcss autoprefixer typescript @types/react @types/node
+
+# ===============================================
+# 3. CREATE EMPTY FILES (then paste artifact code)
+# ===============================================
+touch app/layout.tsx                    # Paste app/layout.tsx artifact
+touch app/page.tsx                      # Paste app/page.tsx artifact
+touch components/AfroDexPlatform.jsx   # ⭐ Paste MAIN COMPONENT artifact
+touch lib/contractClient.js             # Paste contractClient.js artifact
+touch .env.local                        # Paste .env.local artifact
+touch package.json                      # Paste package.json artifact
+touch next.config.mjs                   # Copy config below
+touch tailwind.config.ts                # Copy config below
+touch tsconfig.json                     # Copy config below
+touch postcss.config.js                 # Copy config below
+touch styles/globals.css                # Copy style below
+touch .gitignore                        # Copy ignore below
+
+# ===============================================
+# 4. VERIFY INSTALLATION
+# ===============================================
+npm list next wagmi viem @rainbow-me/rainbowkit
+
+# ===============================================
+# 5. START DEVELOPMENT SERVER
+# ===============================================
+npm run dev
+# Visit: http://localhost:3000
+
+# ===============================================
+# 6. BUILD FOR PRODUCTION
+# ===============================================
+npm run build
+npm start
+
+# ===============================================
+# 7. PUSH TO GITHUB
+# ===============================================
+git init
+git add .
+git commit -m "feat: Add AfroDex modern trading platform v2.0"
+git remote add origin YOUR_GITHUB_REPO_URL
+git push -u origin main
+
+# ===============================================
+# GIT COMMANDS SUMMARY
+# ===============================================
+
+# One-time setup
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+
+# Commit changes
+git add .
+git commit -m "Update: Message here"
+git push origin main
+
+# ===============================================
+# VERCEL DEPLOYMENT
+# ===============================================
+
+# 1. Link to Vercel (first time only)
+npm i -g vercel
+vercel
+
+# 2. Deploy
+vercel --prod
+
+# ===============================================
+# USEFUL NPM COMMANDS
+# ===============================================
+
+# Clear cache
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+
+# Check for outdated packages
+npm outdated
+
+# Update packages
+npm update
+
+# ===============================================
+# ENVIRONMENT SETUP
+# ===============================================
+
+# 1. Get Alchemy API Key:
+#    https://www.alchemy.com → Create app → Copy API Key
+#    Add to .env.local: NEXT_PUBLIC_ALCHEMY_KEY=your_key
+
+# 2. Get WalletConnect Project ID:
+#    https://cloud.walletconnect.com → Create project → Copy ID
+#    Add to .env.local: NEXT_PUBLIC_WC_PROJECT_ID=your_id
+
+# 3. Contract Address (Do NOT change):
+#    0xe8fff15bb5e14095bfdfa8bb85d83cc900c23c56
+
+# ===============================================
+# DEBUGGING
+# ===============================================
+
+# Check if running on correct port
+lsof -i :3000
+
+# Kill process on port 3000
+kill -9 $(lsof -t -i :3000)
+
+# View Next.js logs
+npm run dev -- --verbose
+
+# ===============================================
+# FILE LOCATIONS (GITHUB STRUCTURE)
+# ===============================================
+
+# Main Component:       components/AfroDexPlatform.jsx ⭐
+# App Layout:          app/layout.tsx ✅
+# App Page:            app/page.tsx ✅
+# Contract Helpers:    lib/contractClient.js ✅
+# Contract ABI:        lib/abi/AfroDexABI.json (exists)
+# Global Styles:       styles/globals.css ✅
+# Environment:         .env.local (DO NOT COMMIT) ❌
+# Dependencies:        package.json ✅
+
+# ===============================================
+# CONTRACT ADDRESS (ETHEREUM MAINNET)
+# ===============================================
+
+# Address: 0xe8fff15bb5e14095bfdfa8bb85d83cc900c23c56
+# Network: Ethereum Mainnet (ChainID: 1)
+# Etherscan: https://etherscan.io/address/0xe8fff15bb5e14095bfdfa8bb85d83cc900c23c56
+
+# ===============================================
+# VERCEL ENVIRONMENT VARIABLES
+# ===============================================
+
+# Go to Vercel Dashboard → Settings → Environment Variables
+# Add these:
+# NEXT_PUBLIC_ALCHEMY_KEY = your_key
+# NEXT_PUBLIC_WC_PROJECT_ID = your_id
+# NEXT_PUBLIC_CONTRACT_ADDRESS = 0xe8fff15bb5e14095bfdfa8bb85d83cc900c23c56
+# NEXT_PUBLIC_CHAIN_ID = 1
