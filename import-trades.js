@@ -56,5 +56,9 @@ async function importFile(filePath) {
   console.log('Import complete')
 }
 
+<<<<<<< HEAD
 const filePath = process.argv[2] || './export- transactions-afrodex.xlsx'
+=======
+const filePath = process.argv[2] || './export- transactions-afrodex-exchange-0xe8fff15bb5e14095bfdfa8bb85d83cc900c23c56.xlsx'
+>>>>>>> 323bf7bc432ce2476a31c479e8d302b0b7e6c24d
 importFile(filePath).catch(console.error)
