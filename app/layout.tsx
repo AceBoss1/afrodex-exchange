@@ -1,18 +1,10 @@
 'use client'
 
-import '@/styles/globals.css'
-import { ReactNode } from 'react'
+import { useState } from 'react'
+import AfroDexPlatform from '@/components/AfroDexPlatform'
 
-export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <title>AfroDex - Africa's Biggest DEX</title>
-        <meta name="description" content="AfroDex Decentralized Exchange" />
-      </head>
-      <body className="bg-[#0b0b0f] text-white">
-        {children}
-      </body>
-    </html>
-  )
+export default function Home() {
+  const [collapsed, setCollapsed] = useState(false)
+
+  return <AfroDexPlatform collapsed={collapsed} onToggle={setCollapsed} />
 }
