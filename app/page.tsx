@@ -1,11 +1,10 @@
-// app/page.tsx
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import AfroDexPlatform from '@/components/AfroDexPlatform'
 
-export default function Page() {
+export default function Home() {
   const [collapsed, setCollapsed] = useState(false)
 
-  return <AfroDexPlatform initialCollapsed={collapsed} />
+  return <AfroDexPlatform collapsed={collapsed} onToggle={setCollapsed} />
 }
