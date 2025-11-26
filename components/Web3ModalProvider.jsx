@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use client";
 
 import { WagmiConfig, createConfig, http } from "wagmi";
