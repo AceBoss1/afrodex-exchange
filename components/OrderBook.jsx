@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 export default function OrderBook({ orders = [] }) {
   return (
     <div className="card">
