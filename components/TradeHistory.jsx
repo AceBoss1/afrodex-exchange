@@ -1,5 +1,4 @@
 // components/TradeHistory.jsx
-<<<<<<< HEAD
 'use client'
 
 import { useState, useEffect } from 'react'
