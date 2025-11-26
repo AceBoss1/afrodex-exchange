@@ -10,7 +10,6 @@ export default function TradeBox({ market }) {
   const [amount, setAmount] = useState('')
   const [side, setSide] = useState('Sell')
 
-<<<<<<< HEAD
   if (!market) {
     return (
       <div className="card">
