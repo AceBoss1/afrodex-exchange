@@ -1,5 +1,4 @@
 // components/ChartHeader.jsx
-<<<<<<< HEAD
 'use client'
 export default function ChartHeader({ market }) {
   const price =
