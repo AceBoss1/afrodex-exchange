@@ -1,5 +1,4 @@
 // components/TradeBox.jsx
-<<<<<<< HEAD
 import { useState } from 'react'
 =======
 import { useState } from "react"
