@@ -1,5 +1,3 @@
-# Create new clean file
-cat > styles/globals.css << 'EOF'
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,12 +6,24 @@ cat > styles/globals.css << 'EOF'
   --orange: #ff8c2b;
   --panel: #141419;
   --bg: #0b0b0f;
+  --neon-orange: #ff7a1a;
+  --text-gray: #b5b5b5;
+  --text-white: #ffffff;
+  --bg-hover: #22222a;
+  --border-gray: rgba(255, 255, 255, 0.05);
+  --bg-secondary: #141419;
 }
 
 html, body, #__next {
   height: 100%;
   background: var(--bg);
   color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 ::-webkit-scrollbar {
@@ -25,4 +35,150 @@ html, body, #__next {
   background: rgba(255, 255, 255, 0.06);
   border-radius: 6px;
 }
-EOF
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  height: 100vh;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-gray);
+  padding: 20px 12px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+  min-width: 80px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: 0.2s ease-out;
+}
+
+.sidebar-item:hover {
+  background: var(--bg-hover);
+  color: var(--neon-orange);
+}
+
+.item-text {
+  font-size: 0.9rem;
+}
+
+.main {
+  margin-left: 240px;
+  padding: 25px;
+  width: calc(100% - 240px);
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg);
+  transition: 0.2s ease-out;
+}
+
+.main.collapsed {
+  margin-left: 80px;
+  width: calc(100% - 80px);
+}
+
+/* Cards and Components */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-gray);
+  padding: 18px;
+  border-radius: 12px;
+  transition: 0.2s ease-out;
+}
+
+.card:hover {
+  border-color: var(--neon-orange);
+}
+
+.title-orange {
+  color: var(--neon-orange);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--neon-orange);
+  color: black;
+  font-weight: 600;
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease-out;
+}
+
+.btn-primary:hover {
+  background: #ff9e4c;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--neon-orange);
+  color: var(--neon-orange);
+  font-weight: 600;
+  padding: 10px 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s ease-out;
+}
+
+.btn-outline:hover {
+  background: var(--neon-orange);
+  color: black;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+
+/* Inputs */
+input,
+select,
+textarea {
+  background: #0b0b0e;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-white);
+  padding: 10px;
+  width: 100%;
+  border-radius: 12px;
+  transition: 0.2s ease-out;
+  font-family: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--neon-orange);
+  box-shadow: 0 0 8px rgba(255, 122, 26, 0.4);
+}
