@@ -2,7 +2,6 @@
 export default function MyOrders() {
   return (
     <div className="bg-[#141419] rounded-2xl p-4">
-<<<<<<< HEAD
 
 =======
       <h3 className="text-orange-400 font-semibold text-lg">My Orders</h3>
