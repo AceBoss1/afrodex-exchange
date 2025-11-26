@@ -1,15 +1,15 @@
+cat > app/layout.tsx << 'EOF'
 'use client'
 
 import '@/styles/globals.css'
 import { ReactNode } from 'react'
-import { createConfig, WagmiProvider } from 'wagmi'
-import { http } from 'viem'
+import { createConfig, WagmiProvider, http } from 'wagmi'
 import { mainnet } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
 
-const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID || 'YOUR_WC_PROJECT_ID'
+const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID
 
 const { connectors } = getDefaultWallets({
   appName: 'AfroDex',
@@ -48,3 +48,4 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     </html>
   )
 }
+EOF
