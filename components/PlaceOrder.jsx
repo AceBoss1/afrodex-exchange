@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // components/PlaceOrder.jsx
 
 "use client"
