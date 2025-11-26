@@ -7,6 +7,6 @@ export default function Home() {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <AfroDexPlatform collapsed={collapsed} onToggle={setCollapsed} />
+    <AfroDexPlatform collapsed={collapsed} onToggle={(value: boolean) => setCollapsed(value)} />
   )
 }
