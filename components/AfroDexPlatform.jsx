@@ -24,9 +24,7 @@ export default function AfroDexPlatform({ collapsed = false, onToggle = () => {}
   const [activeTab, setActiveTab] = useState('deposit')
 
   function toggle() {
-    const next = !sidebarCollapsed
-    setSidebarCollapsed(next)
-    onToggle(next)
+    setSidebarCollapsed(prev => !prev)
   }
 
   return (
