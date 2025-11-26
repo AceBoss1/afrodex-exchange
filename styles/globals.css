@@ -1,10 +1,9 @@
-**`styles/globals.css`:**
-```css
+# Create new clean file
+cat > styles/globals.css << 'EOF'
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* custom */
 :root {
   --orange: #ff8c2b;
   --panel: #141419;
@@ -17,6 +16,13 @@ html, body, #__next {
   color: #fff;
 }
 
-/* optional scrollbar */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 6px; }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+}
+EOF
