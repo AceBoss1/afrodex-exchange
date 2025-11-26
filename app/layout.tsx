@@ -1,4 +1,3 @@
-cat > app/layout.tsx << 'EOF'
 'use client'
 
 import '@/styles/globals.css'
@@ -48,4 +47,3 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     </html>
   )
 }
-EOF
